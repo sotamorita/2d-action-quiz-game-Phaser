@@ -1,0 +1,77 @@
+[
+  {
+    "question": "EC2インスタンスに接続する際に利用されるプロトコルはどれですか？",
+    "choices": [
+      "FTP",
+      "SSH",
+      "HTTP",
+      "SMTP"
+    ],
+    "answer": "SSH",
+    "source_chunk": "EC2\nEC２の基本的な機能や仕組みについて理解します。\nEC2の概要\nEC2インスタンスを新規に起動して、インスタンス\nの各種情報を確認します。\nEC2インスタンス\nを起動する\nEC2インスタンスの認証方式である公開鍵認証方式\nを学習します。\n公開鍵認証方式を学ぶ\nレクチャー\nレクチャーで学ぶ内容\nEC2インスタンスに接続する際に利用しているSSH\nプトロコルの仕組みを学習します。\nSSHを学ぶ\n起動したEC２インスタンスにApacheサーバーを設定\nして、簡単なWEBサイトを作成します。\nApacheサーバーを\n設定する",
+    "source_metadata": {
+      "file": "AWS_training6_EC2.pdf",
+      "page": 1
+    }
+  },
+  {
+    "question": "Pythonでリストの最後に要素を追加するメソッドはどれですか？",
+    "choices": [
+      "add()",
+      "append()",
+      "insert()",
+      "push()"
+    ],
+    "answer": "append()",
+    "source_chunk": "Pythonのリスト操作\nリストは順序付きのコレクションで、要素の追加、削除、変更が可能です。\nappend()メソッドを使用してリストの最後に要素を追加できます。\ninsert()メソッドは指定した位置に要素を挿入します。",
+    "source_metadata": {
+      "file": "python_basics.pdf",
+      "page": 5
+    }
+  },
+  {
+    "question": "HTTPステータスコード404の意味は何ですか？",
+    "choices": [
+      "サーバーエラー",
+      "認証が必要",
+      "ページが見つからない",
+      "リクエストが成功"
+    ],
+    "answer": "ページが見つからない",
+    "source_chunk": "HTTPステータスコード\n200: OK - リクエストが成功\n404: Not Found - 要求されたリソースが見つからない\n500: Internal Server Error - サーバー内部エラー",
+    "source_metadata": {
+      "file": "web_development.pdf",
+      "page": 12
+    }
+  },
+  {
+    "question": "SQLでデータを取得するために使用するコマンドはどれですか？",
+    "choices": [
+      "INSERT",
+      "UPDATE",
+      "SELECT",
+      "DELETE"
+    ],
+    "answer": "SELECT",
+    "source_chunk": "SQL基本コマンド\nSELECT: データの取得\nINSERT: データの挿入\nUPDATE: データの更新\nDELETE: データの削除",
+    "source_metadata": {
+      "file": "database_basics.pdf",
+      "page": 3
+    }
+  },
+  {
+    "question": "Gitでローカルリポジトリの変更をリモートリポジトリに送信するコマンドはどれですか？",
+    "choices": [
+      "git pull",
+      "git push",
+      "git commit",
+      "git merge"
+    ],
+    "answer": "git push",
+    "source_chunk": "Git基本操作\ngit add: ステージングエリアに追加\ngit commit: ローカルリポジトリにコミット\ngit push: リモートリポジトリに送信\ngit pull: リモートリポジトリから取得",
+    "source_metadata": {
+      "file": "git_tutorial.pdf",
+      "page": 8
+    }
+  }
+]
