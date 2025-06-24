@@ -17,6 +17,10 @@ export default class GameScene extends Phaser.Scene {
   score: number = 0;
   scoreText!: Phaser.GameObjects.Text;
   hpText!: Phaser.GameObjects.Text;
+  key?: Key;
+  hasKey: boolean = false;
+  castles: Castle[] = [];
+  castle?: Castle;
 
   constructor() {
     super('GameScene');
@@ -120,6 +124,7 @@ export default class GameScene extends Phaser.Scene {
     // コイン・ハートグループ
     this.coins = this.physics.add.group(objects.coins);
     this.hearts = this.physics.add.group(objects.hearts);
+    this.key = objects.keys[0]; // Keyオブジェクトを追加
 
     // コイン取得処理
     this.physics.add.overlap(this.player, this.coins, (playerObj: any, coinObj: any) => {
@@ -130,6 +135,12 @@ export default class GameScene extends Phaser.Scene {
       this.scoreText.setText(`Score: ${this.score}`);
       // ここでアニメーションやエフェクトを追加可能
     });
+
+    // 城の生成
+    this.castles = objects.castles;
+    if (this.castles && this.castles.length > 0) {
+      this.castle = this.castles[0];
+    }
 
     // ハート取得処理
     this.physics.add.overlap(this.player, this.hearts, (playerObj: any, heartObj: any) => {
@@ -160,6 +171,16 @@ export default class GameScene extends Phaser.Scene {
       undefined,
       this
     );
+
+    // 鍵取得処理
+    if (this.key) {
+      this.physics.add.overlap(this.player, this.key, this.handleKeyCollision, undefined, this);
+    }
+
+    // 城との接触判定（常に登録）
+    if (this.castle) {
+      this.physics.add.overlap(this.player, this.castle, this.handleCastleCollision, undefined, this);
+    }
   }
 
   update() {
@@ -227,5 +248,21 @@ export default class GameScene extends Phaser.Scene {
 
     // 現在の敵をクリア
     this.currentEnemy = undefined;
+  };
+
+  handleKeyCollision = (player: any, key: any) => {
+    this.hasKey = true;
+    key.destroy();
+    // 鍵取得時のエフェクトなどを追加可能
+  };
+
+  handleCastleCollision = (player: any, castle: any) => {
+    if (this.hasKey) {
+      // クリア処理
+      console.log('Castle collision with key!'); // デバッグ用
+      this.scene.start('ClearScene', { score: this.score });
+    } else {
+      console.log('Castle collision but no key!'); // デバッグ用
+    }
   };
 }
