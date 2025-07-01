@@ -12,12 +12,16 @@ code_review:
 ignore_patterns:
   - "public/**"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b2f46 (fix: ignore_patternsをglob形式に修正)
   - "**/*.json"
   - "**/*.svg"
   - "**/*.css"
   - "**/*.d.ts"
   - "package.json"
   - "package-lock.json"
+<<<<<<< HEAD
 =======
   - "*.json"
   - "*.svg"
@@ -25,6 +29,8 @@ ignore_patterns:
   - "*.d.ts"
   - "package*.json"
 >>>>>>> d8a428e (fix: Geminiの設定ファイルを修正（最小構成＋スタイル対応）)
+=======
+>>>>>>> e5b2f46 (fix: ignore_patternsをglob形式に修正)
   - "vite.config.ts"
   - "tsconfig.json"
   - "index.html"
