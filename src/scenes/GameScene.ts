@@ -124,7 +124,9 @@ export default class GameScene extends Phaser.Scene {
     // コイン・ハートグループ
     this.coins = this.physics.add.group(objects.coins);
     this.hearts = this.physics.add.group(objects.hearts);
-    this.key = objects.keys[0]; // Keyオブジェクトを追加
+    if (objects.keys && objects.keys.length > 0) {
+      this.key = objects.keys[0];
+    }
 
     // コイン取得処理
     this.physics.add.overlap(this.player, this.coins, (playerObj: any, coinObj: any) => {
@@ -137,9 +139,8 @@ export default class GameScene extends Phaser.Scene {
     });
 
     // 城の生成
-    this.castles = objects.castles;
-    if (this.castles && this.castles.length > 0) {
-      this.castle = this.castles[0];
+    if (objects.castles && objects.castles.length > 0) {
+      this.castle = objects.castles[0];
     }
 
     // ハート取得処理
