@@ -11,11 +11,12 @@ code_review:
 
 ignore_patterns:
   - "public/**"
-  - "*.json"
-  - "*.svg"
-  - "*.css"
-  - "*.d.ts"
-  - "package*.json"
+  - "**/*.json"
+  - "**/*.svg"
+  - "**/*.css"
+  - "**/*.d.ts"
+  - "package.json"
+  - "package-lock.json"
   - "vite.config.ts"
   - "tsconfig.json"
   - "index.html"
