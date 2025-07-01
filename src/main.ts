@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import GameScene from './scenes/GameScene';
 import QuizScene from './scenes/QuizScene';
+import ClearScene from './scenes/ClearScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -12,7 +13,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false
     }
   },
-  scene: [GameScene, QuizScene]
+  scene: [GameScene, QuizScene, ClearScene]
 };
 
 
