@@ -19,7 +19,6 @@ review_comment_severity:
   medium: true
   low: false
 
-# 除外ファイル・パターン
 ignore_patterns:
   - "public/**"
   - "*.json"
@@ -31,18 +30,10 @@ ignore_patterns:
   - "tsconfig.json"
   - "index.html"
 
-# PR作成時の自動レビュー設定
 pull_request_opened:
   summary: true
   code_review: true
 
-# コメント表現の粒度（任意）
-comment_preferences:
-  include_suggestions: true
-  concise_explanation: true
-  reference_style_guide: true
-
-# スタイルガイド連携
 style_guide:
   enabled: true
   path: .gemini/styleguide.md
