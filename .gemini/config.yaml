@@ -3,34 +3,9 @@ version: 1
 enabled_features:
   auto_review: true
   review_pull_request: true
-  inline_suggestions: true
-  post_review_summary: true
 
 code_review:
   disable: false
-  comment_severity_threshold: MEDIUM
-  max_review_comments: 10
-
-review_comment_severity:
-  critical: true
-  high: true
-  medium: true
-  low: false
-
-ignore_patterns:
-  - "public/**"
-  - "*.json"
-  - "*.svg"
-  - "*.css"
-  - "*.d.ts"
-  - "package*.json"
-  - "vite.config.ts"
-  - "tsconfig.json"
-  - "index.html"
-
-pull_request_opened:
-  summary: true
-  code_review: true
 
 style_guide:
   enabled: true
