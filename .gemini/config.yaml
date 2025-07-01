@@ -5,8 +5,6 @@ enabled_features:
   review_pull_request: true
   inline_suggestions: true
   post_review_summary: true
-  severity_level: true
-  suggest_improvements: true
 
 code_review:
   disable: false
@@ -36,4 +34,3 @@ pull_request_opened:
 
 style_guide:
   enabled: true
-  path: .gemini/styleguide.md
