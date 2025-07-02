@@ -7,7 +7,8 @@
 ## ✅ 命名規則（Naming Conventions）
 
 - クラス名：**パスカルケース**（例: `PlayerController`）
-- メソッド・変数・定数：**キャメルケース**（例: `handleInput`, `maxHealth`）
+- メソッド・変数：**キャメルケース**（例: `handleInput`, `currentHealth`）
+- 定数：**アッパースネークケース**（例: `MAX_HEALTH`, `GRAVITY_CONSTANT`）
 - ファイル名：
   - UI/ユーティリティ：キャメルケース可（例: `fontLoader.ts`）
   - シーン・オブジェクト：パスカルケース推奨（例: `GameScene.ts`）
