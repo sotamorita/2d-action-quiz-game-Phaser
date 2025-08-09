@@ -10,29 +10,53 @@ import Heart from '../objects/Heart';
 export default class GameScene extends Phaser.Scene {
   player!: Player;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+
   platforms!: Phaser.Physics.Arcade.StaticGroup;
+
   enemies!: Phaser.Physics.Arcade.Group;
   coins!: Phaser.Physics.Arcade.Group;
   hearts!: Phaser.Physics.Arcade.Group;
-  score: number = 0;
+
+  score = 0;
   scoreText!: Phaser.GameObjects.Text;
   hpText!: Phaser.GameObjects.Text;
+
   key?: Key;
-  hasKey: boolean = false;
-  castles: Castle[] = [];
+  hasKey = false;
+
   castle?: Castle;
+
+  // Colliders
+  enemyCollider?: Phaser.Physics.Arcade.Collider;
+  coinCollider?: Phaser.Physics.Arcade.Collider;
+  heartCollider?: Phaser.Physics.Arcade.Collider;
+  keyCollider?: Phaser.Physics.Arcade.Collider;
+  castleCollider?: Phaser.Physics.Arcade.Collider;
+
+  // Enemy ref during quiz
+  currentEnemy?: Enemy;
+
+  // Scene event handlers (for cleanup)
+  private onScenePause = () => {
+    this.input.keyboard!.enabled = false;
+  };
+  private onSceneResume = () => {
+    this.input.keyboard!.enabled = true;
+    if (this.player?.body) this.player.body.enable = true;
+  };
 
   constructor() {
     super('GameScene');
   }
 
   preload() {
-    // プレイヤー、敵、地面スプライトの読み込み
+    // Player spritesheet
     this.load.spritesheet('player', 'assets/player/player.png', {
       frameWidth: 32,
       frameHeight: 48
     });
 
+    // Images
     this.load.image('ground', 'assets/platform.png');
     this.load.image('enemy', 'assets/enemy.png');
     this.load.image('coin', 'assets/coin.png');
@@ -40,120 +64,77 @@ export default class GameScene extends Phaser.Scene {
     this.load.image('castle', 'assets/castle.png');
     this.load.image('heart', 'assets/heart.png');
 
-    // マップデータの読み込み（仮: assets/maps/level1.json）
+    // Map JSON
     this.load.json('map', 'assets/maps/level1.json');
   }
 
-  enemyCollider?: Phaser.Physics.Arcade.Collider;
-  currentEnemy?: Enemy;
-
   create() {
-    // QuizSceneからの結果を受け取るイベントリスナー
+    // Result from QuizScene
     this.events.on('quiz-completed', this.handleQuizResult, this);
 
-    // pause/resume時の処理
-    this.events.on('pause', () => {
-      this.input.keyboard!.enabled = false;
-    });
+    // pause/resume handlers
+    this.events.on('pause', this.onScenePause, this);
+    this.events.on('resume', this.onSceneResume, this);
 
-    this.events.on('resume', () => {
-      this.input.keyboard!.enabled = true;
-      // プレイヤー操作を再開
-      if (this.player.body) {
-        this.player.body.enable = true;
-      }
-    });
-    // キー入力
+    // Keyboard
     this.cursors = this.input.keyboard!.createCursorKeys();
 
-    // ワールドサイズとカメラ設定
+    // World & camera
     const mapWidth = 1600;
     const mapHeight = 600;
     this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
-    // 地面（StaticGroup）
+    // Ground
     this.platforms = this.physics.add.staticGroup();
     this.platforms.create(400, 536, 'ground').setScale(2).refreshBody();
     this.platforms.create(1200, 536, 'ground').setScale(2).refreshBody();
 
-    // マップデータからオブジェクト生成
+    // Load map objects
     const mapData = this.cache.json.get('map');
+    if (!mapData) {
+      throw new Error('assets/maps/level1.json が読み込めていません（パス or JSON 構文を確認）');
+    }
     const objects = MapLoader.load(this, mapData, this.cursors);
 
-    // プレイヤー
+    // Player
     if (!objects.player) {
       throw new Error('マップデータにプレイヤーが定義されていません');
     }
     this.player = objects.player;
-    this.player.setDepth(10); // Playerを最前面に描画
+    this.player.setDepth(10);
     this.physics.add.collider(this.player, this.platforms);
 
-    // カメラ追従
+    // Camera follow
     this.cameras.main.startFollow(this.player);
     this.cameras.main.setLerp(1, 1);
 
-    // アニメーション定義
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: 'turn',
-      frames: [{ key: 'player', frame: 4 }],
-      frameRate: 20
-    });
-
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('player', { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    // 敵グループ
-    this.enemies = this.physics.add.group();
-    objects.enemies.forEach(enemy => {
-      this.enemies.add(enemy);
-    });
-
-    // コイン・鍵・城グループ（必要に応じてグループ化）
-    // コイン・ハートグループ
-    this.coins = this.physics.add.group(objects.coins);
-    this.hearts = this.physics.add.group(objects.hearts);
-    if (objects.keys && objects.keys.length > 0) {
-      this.key = objects.keys[0];
+    // Animations (guard against re-register)
+    if (!this.anims.exists('left')) {
+      this.anims.create({
+        key: 'left',
+        frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
+    if (!this.anims.exists('turn')) {
+      this.anims.create({
+        key: 'turn',
+        frames: [{ key: 'player', frame: 4 }],
+        frameRate: 20
+      });
+    }
+    if (!this.anims.exists('right')) {
+      this.anims.create({
+        key: 'right',
+        frames: this.anims.generateFrameNumbers('player', { start: 5, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+      });
     }
 
-    // コイン取得処理
-    this.physics.add.overlap(this.player, this.coins, (playerObj: any, coinObj: any) => {
-      const player = playerObj as Player;
-      const coin = coinObj as Coin;
-      coin.destroy();
-      this.score += coin.value ?? 1;
-      this.scoreText.setText(`Score: ${this.score}`);
-      // ここでアニメーションやエフェクトを追加可能
-    });
-
-    // 城の生成
-    if (objects.castles && objects.castles.length > 0) {
-      this.castle = objects.castles[0];
-    }
-
-    // ハート取得処理
-    this.physics.add.overlap(this.player, this.hearts, (playerObj: any, heartObj: any) => {
-      const player = playerObj as Player;
-      const heart = heartObj as Heart;
-      heart.destroy();
-      player.heal(heart.healAmount ?? 1);
-      this.hpText.setText(`HP: ${player.health}`);
-      // ここでアニメーションやエフェクトを追加可能
-    });
-
-    // UI表示
+    // --- UI first (avoid race if overlaps fire immediately) ---
     this.scoreText = this.add.text(16, 16, 'Score: 0', {
       fontSize: '20px',
       color: '#ffffff'
@@ -164,50 +145,97 @@ export default class GameScene extends Phaser.Scene {
       color: '#ffffff'
     }).setScrollFactor(0);
 
-    // プレイヤーと敵の接触時にクイズ表示
+    // Groups
+    this.enemies = this.physics.add.group();
+    objects.enemies.forEach(e => this.enemies.add(e));
+
+    this.coins = this.physics.add.group(objects.coins);
+    this.hearts = this.physics.add.group(objects.hearts);
+
+    if (objects.keys && objects.keys.length > 0) {
+      this.key = objects.keys[0];
+    }
+    if (objects.castles && objects.castles.length > 0) {
+      this.castle = objects.castles[0];
+    }
+
+    // Overlaps & collisions
     this.enemyCollider = this.physics.add.overlap(
       this.player,
       this.enemies,
-      this.handleEnemyCollision,
+      this.handleEnemyCollision as any,
       undefined,
       this
     );
 
-    // 鍵取得処理
+    this.coinCollider = this.physics.add.overlap(
+      this.player,
+      this.coins,
+      (playerObj: any, coinObj: any) => {
+        const coin = coinObj as Coin;
+        coin.destroy();
+        this.score += coin.value ?? 1;
+        this.scoreText.setText(`Score: ${this.score}`);
+      },
+      undefined,
+      this
+    );
+
+    this.heartCollider = this.physics.add.overlap(
+      this.player,
+      this.hearts,
+      (playerObj: any, heartObj: any) => {
+        const heart = heartObj as Heart;
+        heart.destroy();
+        this.player.heal(heart.healAmount ?? 1);
+        this.hpText.setText(`HP: ${this.player.health}`);
+      },
+      undefined,
+      this
+    );
+
     if (this.key) {
-      this.physics.add.overlap(this.player, this.key, this.handleKeyCollision, undefined, this);
+      this.keyCollider = this.physics.add.overlap(
+        this.player,
+        this.key,
+        this.handleKeyCollision as any,
+        undefined,
+        this
+      );
     }
 
-    // 城との接触判定（常に登録）
     if (this.castle) {
-      this.physics.add.overlap(this.player, this.castle, this.handleCastleCollision, undefined, this);
+      this.castleCollider = this.physics.add.overlap(
+        this.player,
+        this.castle,
+        this.handleCastleCollision as any,
+        undefined,
+        this
+      );
     }
+
+    // Cleanup on shutdown/destroy
+    this.events.once('shutdown', this.cleanup, this);
+    this.events.once('destroy', this.cleanup, this);
   }
 
   update() {
     this.player.update();
-    // HP表示を毎フレーム更新（必要なら）
     this.hpText.setText(`HP: ${this.player.health}`);
   }
 
-  handleEnemyCollision = (player: any, enemy: any) => {
-    // 無敵状態なら何もしない
-    if (this.player.isInvincible) {
-      return;
-    }
-    // 既に敵がdestroyされている場合は何もしない
-    if (!enemy.active) {
-      return;
-    }
+  private handleEnemyCollision = (_player: any, enemy: any) => {
+    if (this.player.isInvincible) return;
+    if (!enemy.active) return;
 
-    // 現在の敵を保存
     this.currentEnemy = enemy as Enemy;
 
-    // プレイヤーと敵のbodyを一時無効化
     if (this.player.body) this.player.body.enable = false;
     if (enemy.body) enemy.body.enable = false;
 
-    // クイズシーン開始
+    // Disable input to avoid double launch
+    this.input.keyboard!.enabled = false;
+
     this.scene.pause();
     this.scene.launch('QuizScene', {
       enemy: enemy,
@@ -215,15 +243,12 @@ export default class GameScene extends Phaser.Scene {
     });
   };
 
-  handleQuizResult = (isCorrect: boolean) => {
-    // クイズ結果処理
+  private handleQuizResult = (isCorrect: boolean) => {
     if (isCorrect) {
-      // 正解の場合、敵を削除
       if (this.currentEnemy && this.currentEnemy.active) {
         this.currentEnemy.destroy();
       }
     } else {
-      // 不正解の場合、HPを減らして無敵時間を設定
       this.player.damage(1);
       this.player.startInvincibility(3000);
 
@@ -233,37 +258,46 @@ export default class GameScene extends Phaser.Scene {
         return;
       }
 
-      // 敵のbodyを再有効化（再衝突可能にする）
       if (this.currentEnemy && this.currentEnemy.body) {
         this.currentEnemy.body.enable = true;
       }
     }
 
-    // プレイヤーのbodyを再有効化
-    if (this.player.body) {
-      this.player.body.enable = true;
-    }
+    if (this.player.body) this.player.body.enable = true;
 
-    // シーンを再開
+    // Re-enable input (QuizScene closed by itself)
+    this.input.keyboard!.enabled = true;
+
     this.scene.resume();
-
-    // 現在の敵をクリア
     this.currentEnemy = undefined;
   };
 
-  handleKeyCollision = (player: any, key: any) => {
+  private handleKeyCollision = (_player: any, key: any) => {
     this.hasKey = true;
     key.destroy();
-    // 鍵取得時のエフェクトなどを追加可能
+    // hintなどあればここで
   };
 
-  handleCastleCollision = (player: any, castle: any) => {
+  private handleCastleCollision = (_player: any, _castle: any) => {
     if (this.hasKey) {
-      // クリア処理
-      console.log('Castle collision with key!'); // デバッグ用
       this.scene.start('ClearScene', { score: this.score });
     } else {
-      console.log('Castle collision but no key!'); // デバッグ用
+      // ヒント等
+      // console.log('鍵が必要です');
     }
   };
+
+  private cleanup() {
+    // Off scene events
+    this.events.off('quiz-completed', this.handleQuizResult, this);
+    this.events.off('pause', this.onScenePause, this);
+    this.events.off('resume', this.onSceneResume, this);
+
+    // Destroy colliders
+    this.enemyCollider?.destroy();
+    this.coinCollider?.destroy();
+    this.heartCollider?.destroy();
+    this.keyCollider?.destroy();
+    this.castleCollider?.destroy();
+  }
 }
