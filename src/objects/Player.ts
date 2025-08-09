@@ -73,7 +73,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     } else if (this.cursors.right?.isDown) {
       this.setVelocityX(this.speed);
       this.anims.play('right', true);
-    } else {
+    } else if (body.blocked.down) {
+      // 地上にいる時のみ速度を0にする（空中では慣性を保持）
       this.setVelocityX(0);
       this.anims.play('turn');
     }
