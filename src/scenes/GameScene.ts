@@ -288,7 +288,11 @@ export default class GameScene extends Phaser.Scene {
 
       if (this.player.health <= 0) {
         this.scene.stop();
-        this.scene.start('GameOverScene');
+        this.scene.start('GameOverScene', {
+          stageId: this.currentStageId,
+          mapPath: this.currentMapPath,
+          score: this.score
+        });
         return;
       }
 

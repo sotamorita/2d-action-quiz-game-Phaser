@@ -4,6 +4,7 @@ import StageSelectScene from './scenes/StageSelectScene';
 import GameScene from './scenes/GameScene';
 import QuizScene from './scenes/QuizScene';
 import ClearScene from './scenes/ClearScene';
+import GameOverScene from './scenes/GameOverScene';
 import PauseOverlayScene from './scenes/PauseOverlayScene';
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -16,7 +17,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false
     }
   },
-  scene: [TitleScene, StageSelectScene, GameScene, QuizScene, ClearScene, PauseOverlayScene]
+  scene: [TitleScene, StageSelectScene, GameScene, QuizScene, ClearScene, GameOverScene, PauseOverlayScene]
 };
 
 
