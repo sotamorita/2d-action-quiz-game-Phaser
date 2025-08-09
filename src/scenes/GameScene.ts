@@ -26,6 +26,10 @@ export default class GameScene extends Phaser.Scene {
 
   castle?: Castle;
 
+  // ステージデータ（PauseOverlayScene用）
+  private currentStageId?: string;
+  private currentMapPath?: string;
+
   // Colliders
   enemyCollider?: Phaser.Physics.Arcade.Collider;
   coinCollider?: Phaser.Physics.Arcade.Collider;
@@ -45,8 +49,27 @@ export default class GameScene extends Phaser.Scene {
     if (this.player?.body) this.player.body.enable = true;
   };
 
+  // Escキーハンドラー（PauseOverlayScene呼び出し用）
+  private onEscKey = () => {
+    // Phaserの標準機能でシーンを一時停止
+    this.scene.pause();
+
+    // PauseOverlaySceneを起動
+    this.scene.launch('PauseOverlayScene', {
+      stageId: this.currentStageId,
+      mapPath: this.currentMapPath,
+      returnScene: 'GameScene'
+    });
+  };
+
   constructor() {
     super('GameScene');
+  }
+
+  init(data: { stageId?: string; mapPath?: string }) {
+    // ステージデータを受け取り
+    this.currentStageId = data.stageId || 'level1';
+    this.currentMapPath = data.mapPath || 'assets/maps/level1.json';
   }
 
   preload() {
@@ -79,6 +102,10 @@ export default class GameScene extends Phaser.Scene {
 
     // Keyboard
     this.cursors = this.input.keyboard!.createCursorKeys();
+
+    // Escキー設定（PauseOverlayScene呼び出し用）
+    const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    escKey.on('down', this.onEscKey, this);
 
     // Background image (tiled to cover the entire world)
     const background = this.add.tileSprite(0, 80, 1600, 320, 'background');
@@ -299,6 +326,10 @@ export default class GameScene extends Phaser.Scene {
     this.events.off('quiz-completed', this.handleQuizResult, this);
     this.events.off('pause', this.onScenePause, this);
     this.events.off('resume', this.onSceneResume, this);
+
+    // Off key events
+    const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    escKey.off('down', this.onEscKey, this);
 
     // Destroy colliders
     this.enemyCollider?.destroy();
