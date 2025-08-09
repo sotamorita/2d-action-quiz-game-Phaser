@@ -70,6 +70,11 @@ export default class GameScene extends Phaser.Scene {
     // ステージデータを受け取り
     this.currentStageId = data.stageId || 'level1';
     this.currentMapPath = data.mapPath || 'assets/maps/level1.json';
+
+    // ゲーム状態を明示的にリセット（他シーンからの復帰時の一貫性確保）
+    this.score = 0;
+    this.hasKey = false;
+    this.currentEnemy = undefined;
   }
 
   preload() {
@@ -93,6 +98,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    // 入力状態を確実に初期化（他シーンからの復帰時の一貫性確保）
+    this.input.keyboard!.enabled = true;
+
     // Result from QuizScene
     this.events.on('quiz-completed', this.handleQuizResult, this);
 
@@ -138,6 +146,11 @@ export default class GameScene extends Phaser.Scene {
     this.player = objects.player;
     this.player.setDepth(10);
     this.physics.add.collider(this.player, this.platforms);
+
+    // プレイヤーの物理ボディを確実に有効化（他シーンからの復帰時の一貫性確保）
+    if (this.player?.body) {
+      this.player.body.enable = true;
+    }
 
     // Camera follow
     this.cameras.main.startFollow(this.player);
