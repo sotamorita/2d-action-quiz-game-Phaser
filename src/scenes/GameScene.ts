@@ -314,7 +314,11 @@ export default class GameScene extends Phaser.Scene {
 
   private handleCastleCollision = (_player: any, _castle: any) => {
     if (this.hasKey) {
-      this.scene.start('ClearScene', { score: this.score });
+      this.scene.start('ClearScene', {
+        stageId: this.currentStageId,
+        mapPath: this.currentMapPath,
+        score: this.score
+      });
     } else {
       // ヒント等
       // console.log('鍵が必要です');

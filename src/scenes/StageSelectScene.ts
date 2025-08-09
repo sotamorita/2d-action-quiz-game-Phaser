@@ -27,10 +27,13 @@ export default class StageSelectScene extends Phaser.Scene {
   };
 
   private on1Key = () => {
-    // 1キーで直接レベル1を選択
+    // 1キーで直接レベル1を選択して開始
     if (this.stages.length > 0) {
-      this.selectedIndex = 0;
-      this.updateMenuHighlight();
+      const selectedStage = this.stages[0]; // レベル1を直接選択
+      this.scene.start('GameScene', {
+        stageId: selectedStage.id,
+        mapPath: selectedStage.mapPath
+      });
     }
   };
 
