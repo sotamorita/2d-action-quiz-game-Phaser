@@ -5,8 +5,8 @@ import ClearScene from './scenes/ClearScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  width: 640,
+  height: 400,
   physics: {
     default: 'arcade',
     arcade: {

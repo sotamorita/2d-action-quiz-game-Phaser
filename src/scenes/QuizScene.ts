@@ -32,21 +32,21 @@ export default class QuizScene extends Phaser.Scene {
     this.input.keyboard!.enabled = true;
 
     // 背景
-    this.add.rectangle(400, 300, 800, 600, 0x000000, 0.6);
+    this.add.rectangle(320, 200, 640, 400, 0x000000, 0.6);
 
     // 質問（仮）
-    this.add.text(400, 160, '2 + 2 = ?', {
-      fontSize: '28px',
+    this.add.text(320, 120, '2 + 2 = ?', {
+      fontSize: '22px',
       color: '#ffffff'
     }).setOrigin(0.5);
 
     // 選択肢
     this.choices.forEach((choice, i) => {
-      const text = this.add.text(400, 240 + i * 48, choice, {
-        fontSize: '24px',
+      const text = this.add.text(320, 160 + i * 35, choice, {
+        fontSize: '18px',
         color: '#ffffff',
         backgroundColor: '#333333',
-        padding: { x: 20, y: 10 }
+        padding: { x: 15, y: 8 }
       }).setOrigin(0.5);
       this.choiceTexts.push(text);
     });

@@ -57,6 +57,7 @@ export default class GameScene extends Phaser.Scene {
     });
 
     // Images
+    this.load.image('background', 'assets/maps/background.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('enemy', 'assets/enemy.png');
     this.load.image('coin', 'assets/coin.png');
@@ -79,16 +80,22 @@ export default class GameScene extends Phaser.Scene {
     // Keyboard
     this.cursors = this.input.keyboard!.createCursorKeys();
 
+    // Background image (tiled to cover the entire world)
+    const background = this.add.tileSprite(0, 80, 1600, 320, 'background');
+    background.setOrigin(0, 0);
+
     // World & camera
     const mapWidth = 1600;
-    const mapHeight = 600;
+    const mapHeight = 400;
     this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
-    // Ground
+    // Ground (positioned slightly above the bottom of the background image)
     this.platforms = this.physics.add.staticGroup();
-    this.platforms.create(400, 536, 'ground').setScale(2).refreshBody();
-    this.platforms.create(1200, 536, 'ground').setScale(2).refreshBody();
+    // Create multiple platforms across the world width
+    for (let x = 200; x <= 1400; x += 400) {
+      this.platforms.create(x, 380, 'ground').setScale(2).refreshBody();
+    }
 
     // Load map objects
     const mapData = this.cache.json.get('map');
