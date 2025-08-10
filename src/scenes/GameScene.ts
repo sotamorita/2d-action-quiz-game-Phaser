@@ -285,7 +285,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.scene.pause();
     this.scene.launch('QuizScene', {
-      enemy: enemy,
+      category: 'general',
       returnSceneKey: this.scene.key
     });
   };
