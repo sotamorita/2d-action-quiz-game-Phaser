@@ -26,15 +26,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     // body に型アサーション（以降、すべての body 操作で安全）
     const body = this.body as Phaser.Physics.Arcade.Body;
 
-    body.setGravityY(800);         // 重力を下方向にかける
+    body.setGravityY(950);         // 重力を下方向にかける
     this.setBounce(0.1);           // 軽く跳ねる
     this.setCollideWorldBounds(true); // 画面端で止まる
 
     this.cursors = cursors;
 
     // Tiledプロパティ
-    this.speed = properties.speed ?? 200;
-    this.jumpForce = properties.jumpForce ?? 360;
+    this.speed = properties.speed ?? 1000;
+    this.jumpForce = properties.jumpForce ?? 700;
     this.maxHealth = properties.maxHealth ?? 5;
     this.health = this.maxHealth;
   }
