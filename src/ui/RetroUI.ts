@@ -38,17 +38,24 @@ export class RetroUI {
     container: Phaser.GameObjects.Container,
     startY: number = -50,
     spacing: number = 40,
-    fontSize: string = '20px'
+    fontSize: string = '20px',
+    wordWrapWidth?: number
   ): Phaser.GameObjects.Text[] {
     const menuItems: Phaser.GameObjects.Text[] = [];
 
     options.forEach((option, index) => {
-      const menuText = scene.add.text(0, startY + (index * spacing), option, {
+      const style: Phaser.Types.GameObjects.Text.TextStyle = {
         fontSize: fontSize,
         color: '#ffffff',
         backgroundColor: 'rgba(0,0,0,0)',
         padding: { x: 10, y: 5 }
-      }).setOrigin(0.5);
+      };
+
+      if (wordWrapWidth) {
+        style.wordWrap = { width: wordWrapWidth, useAdvancedWrap: true };
+      }
+
+      const menuText = scene.add.text(0, startY + (index * spacing), option, style).setOrigin(0.5);
 
       menuItems.push(menuText);
       container.add(menuText);
@@ -68,10 +75,14 @@ export class RetroUI {
     items.forEach((item, index) => {
       if (!item || !item.active) return;
 
+      // 現在のスタイルを保持
+      const currentStyle = item.style;
+
       if (index === selectedIndex) {
         // 選択中：黄色背景＋黒文字＋先頭に「▶」
         item.setText(`▶ ${options[index]}`);
         item.setStyle({
+          ...currentStyle, // 既存のスタイルをコピー
           backgroundColor: '#ffff00',
           color: '#000000',
           padding: { x: 10, y: 5 }
@@ -80,6 +91,7 @@ export class RetroUI {
         // 非選択：透明背景＋白文字
         item.setText(options[index]);
         item.setStyle({
+          ...currentStyle, // 既存のスタイルをコピー
           backgroundColor: 'rgba(0,0,0,0)',
           color: '#ffffff',
           padding: { x: 10, y: 5 }
@@ -117,13 +129,20 @@ export class RetroUI {
     text: string,
     y: number = 100,
     fontSize: string = '14px',
-    color: string = '#cccccc'
+    color: string = '#cccccc',
+    wordWrapWidth?: number
   ): Phaser.GameObjects.Text {
-    const instructionText = scene.add.text(0, y, text, {
+    const style: Phaser.Types.GameObjects.Text.TextStyle = {
       fontSize: fontSize,
       color: color,
       align: 'center'
-    }).setOrigin(0.5);
+    };
+
+    if (wordWrapWidth) {
+      style.wordWrap = { width: wordWrapWidth, useAdvancedWrap: true };
+    }
+
+    const instructionText = scene.add.text(0, y, text, style).setOrigin(0.5);
 
     container.add(instructionText);
     return instructionText;

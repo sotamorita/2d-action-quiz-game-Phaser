@@ -195,41 +195,17 @@ export default class QuizScene extends Phaser.Scene {
     this.currentQuestion = this.quizData[randomIndex];
   }
 
-  private formatQuestionText(question: string): string {
-    const MAX_QUESTION_LENGTH = 120; // 約3-4行に収まる文字数
-
-    if (question.length <= MAX_QUESTION_LENGTH) {
-      return question;
-    }
-
-    // 文字数制限を超える場合は切り詰めて「...」を追加
-    return question.substring(0, MAX_QUESTION_LENGTH - 3) + '...';
-  }
-
-  private formatChoiceText(choice: string): string {
-    const MAX_CHOICE_LENGTH = 40; // 1行に収まる文字数
-
-    if (choice.length <= MAX_CHOICE_LENGTH) {
-      return choice;
-    }
-
-    return choice.substring(0, MAX_CHOICE_LENGTH - 3) + '...';
-  }
-
   private showQuestion(): void {
     if (!this.currentQuestion) return;
 
     this.currentState = QuizState.QUESTION;
 
-    // 問題文を制限内に収める
-    const formattedQuestion = this.formatQuestionText(this.currentQuestion.question);
-
     // 問題文表示
-    this.questionText = this.add.text(0, -100, formattedQuestion, {
+    this.questionText = this.add.text(0, -100, this.currentQuestion.question, {
       fontSize: '18px',
       color: '#ffffff',
       align: 'center',
-      wordWrap: { width: 450 }
+      wordWrap: { width: 480, useAdvancedWrap: true } // wordWrapWidthを480に調整
     }).setOrigin(0.5);
 
     this.questionPanel.add(this.questionText);
@@ -237,12 +213,12 @@ export default class QuizScene extends Phaser.Scene {
     // 選択肢表示
     this.choiceTexts = [];
     this.currentQuestion.choices.forEach((choice, index) => {
-      const formattedChoice = this.formatChoiceText(choice);
-      const choiceText = this.add.text(0, -20 + index * 35, `${index + 1}. ${formattedChoice}`, {
+      const choiceText = this.add.text(0, -20 + index * 35, `${index + 1}. ${choice}`, {
         fontSize: '16px',
         color: '#ffffff',
         backgroundColor: 'rgba(0,0,0,0)',
-        padding: { x: 10, y: 5 }
+        padding: { x: 10, y: 5 },
+        wordWrap: { width: 480, useAdvancedWrap: true } // wordWrapWidthを480に調整
       }).setOrigin(0.5);
 
       this.choiceTexts.push(choiceText);
@@ -256,19 +232,22 @@ export default class QuizScene extends Phaser.Scene {
     this.choiceTexts.forEach((text, index) => {
       if (!text.scene || !text.active) return;
 
+      // 現在のスタイルを保持
+      const currentStyle = text.style;
+
       if (index === this.selectedIndex) {
         // 選択中：黄色背景＋黒文字＋先頭に「▶」
-        const formattedChoice = this.formatChoiceText(this.currentQuestion!.choices[index]);
-        text.setText(`▶ ${index + 1}. ${formattedChoice}`);
+        text.setText(`▶ ${index + 1}. ${this.currentQuestion!.choices[index]}`);
         text.setStyle({
+          ...currentStyle, // 既存のスタイルをコピー
           backgroundColor: '#ffff00',
           color: '#000000'
         });
       } else {
         // 非選択：透明背景＋白文字
-        const formattedChoice = this.formatChoiceText(this.currentQuestion!.choices[index]);
-        text.setText(`${index + 1}. ${formattedChoice}`);
+        text.setText(`${index + 1}. ${this.currentQuestion!.choices[index]}`);
         text.setStyle({
+          ...currentStyle, // 既存のスタイルをコピー
           backgroundColor: 'rgba(0,0,0,0)',
           color: '#ffffff'
         });
@@ -373,7 +352,8 @@ export default class QuizScene extends Phaser.Scene {
     // 操作説明
     const instructionText = this.add.text(0, 140, 'Enter / Space / Esc キーで閉じる', {
       fontSize: '14px',
-      color: '#cccccc'
+      color: '#cccccc',
+      wordWrap: { width: 500, useAdvancedWrap: true } // 追加
     }).setOrigin(0.5);
 
     this.resultPanel.add(instructionText);

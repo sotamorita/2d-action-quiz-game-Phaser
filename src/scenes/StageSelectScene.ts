@@ -60,7 +60,7 @@ export default class StageSelectScene extends Phaser.Scene {
     this.selectedIndex = 0;
 
     // レトロ風UIパネル作成
-    const { overlay, panel } = RetroUI.createPanel(this, 320, 200, 400, 250);
+    const { overlay, panel } = RetroUI.createPanel(this, 320, 200, 400, 300); // 高さを250から300に増加
     this.panel = panel;
 
     // タイトルテキスト
@@ -77,12 +77,42 @@ export default class StageSelectScene extends Phaser.Scene {
     );
 
     // 操作説明
+    // 以前の単一のテキストを分割し、それぞれを独立したテキストオブジェクトとして作成
     RetroUI.createInstructionText(
       this,
       this.panel,
-      '↑/↓: 移動  1: 直接選択  Enter: 決定  Esc: タイトルに戻る',
-      60,
-      '16px'
+      '↑/↓: 移動',
+      60, // 最初の行のY座標
+      '16px',
+      '#cccccc',
+      380
+    );
+    RetroUI.createInstructionText(
+      this,
+      this.panel,
+      '1: 直接選択',
+      80, // 2行目のY座標
+      '16px',
+      '#cccccc',
+      380
+    );
+    RetroUI.createInstructionText(
+      this,
+      this.panel,
+      'Enter: 決定',
+      100, // 3行目のY座標
+      '16px',
+      '#cccccc',
+      380
+    );
+    RetroUI.createInstructionText(
+      this,
+      this.panel,
+      'Esc: タイトルに戻る',
+      120, // 4行目のY座標
+      '16px',
+      '#cccccc',
+      380
     );
 
     // キー入力設定

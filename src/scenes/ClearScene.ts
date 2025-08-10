@@ -83,7 +83,8 @@ export default class ClearScene extends Phaser.Scene {
       this.panel,
       -10,
       35,
-      '20px'
+      '20px',
+      380 // wordWrapWidthを追加
     );
 
     // キー入力設定
@@ -108,7 +109,9 @@ export default class ClearScene extends Phaser.Scene {
       this.panel,
       '↑/↓: 選択  Enter: 決定\nR: 再挑戦  T: タイトル',
       100,
-      '12px'
+      '12px',
+      '#cccccc', // colorを明示的に指定
+      380 // wordWrapWidth
     );
 
     // クリーンアップ設定
