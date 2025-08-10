@@ -169,23 +169,23 @@ export default class QuizScene extends Phaser.Scene {
 
   private createUI(): void {
     // 半透明黒のオーバーレイ
-    this.overlay = this.add.rectangle(320, 200, 640, 400, 0x000000, 0.6);
+    this.overlay = this.add.rectangle(320, 160, 640, 320, 0x000000, 0.6); // Y座標を160に、高さを320に調整
 
     // 問題表示用パネル（中央、太枠・直角）
-    this.questionPanel = this.add.container(320, 200);
+    this.questionPanel = this.add.container(320, 160); // Y座標を160に調整
 
-    const panelBg = this.add.rectangle(0, 0, 500, 300, 0x000000, 0.8);
-    const panelBorder = this.add.rectangle(0, 0, 500, 300, 0xffffff, 0);
+    const panelBg = this.add.rectangle(0, 0, 500, 250, 0x000000, 0.8); // 高さを250に調整
+    const panelBorder = this.add.rectangle(0, 0, 500, 250, 0xffffff, 0); // 高さを250に調整
     panelBorder.setStrokeStyle(4, 0xffffff);
 
     this.questionPanel.add([panelBg, panelBorder]);
 
     // 結果表示用パネル
-    this.resultPanel = this.add.container(320, 200);
+    this.resultPanel = this.add.container(320, 160); // Y座標を160に調整
     this.resultPanel.setVisible(false);
 
-    const resultBg = this.add.rectangle(0, 0, 550, 350, 0x000000, 0.9);
-    const resultBorder = this.add.rectangle(0, 0, 550, 350, 0xffffff, 0);
+    const resultBg = this.add.rectangle(0, 0, 550, 300, 0x000000, 0.9); // 高さを300に調整
+    const resultBorder = this.add.rectangle(0, 0, 550, 300, 0xffffff, 0); // 高さを300に調整
     resultBorder.setStrokeStyle(4, 0xffffff);
 
     this.resultPanel.add([resultBg, resultBorder]);
@@ -202,8 +202,8 @@ export default class QuizScene extends Phaser.Scene {
     this.currentState = QuizState.QUESTION;
 
     // 問題文表示
-    this.questionText = RetroUI.createSimpleText(this, 0, -100, this.currentQuestion.question, {
-      fontSize: '18px',
+    this.questionText = RetroUI.createSimpleText(this, 0, -60, this.currentQuestion.question, { // Y座標を-60に調整
+      fontSize: '16px', // フォントサイズを16pxに縮小
       align: 'center',
       wordWrap: { width: 480, useAdvancedWrap: true } // wordWrapWidthを480に調整
     }).setOrigin(0.5);
@@ -213,8 +213,8 @@ export default class QuizScene extends Phaser.Scene {
     // 選択肢表示
     this.choiceTexts = [];
     this.currentQuestion.choices.forEach((choice, index) => {
-      const choiceText = RetroUI.createSimpleText(this, 0, -20 + index * 35, `${index + 1}. ${choice}`, {
-        fontSize: '16px',
+      const choiceText = RetroUI.createSimpleText(this, 0, -20 + index * 30, `${index + 1}. ${choice}`, { // Y座標を-20に調整, 行間を30に調整
+        fontSize: '14px', // フォントサイズを14pxに縮小
         backgroundColor: 'rgba(0,0,0,0)',
         padding: { x: 10, y: 5 }
         // wordWrapはRetroUI.createSimpleTextのデフォルトを使用
@@ -327,8 +327,8 @@ export default class QuizScene extends Phaser.Scene {
     const resultColor = this.isCorrect ? '#00ff00' : '#ff0000';
     const resultMessage = this.isCorrect ? '正解！' : '不正解…';
 
-    const resultText = RetroUI.createSimpleText(this, 0, -140, resultMessage, {
-      fontSize: '24px',
+    const resultText = RetroUI.createSimpleText(this, 0, -100, resultMessage, { // Y座標を-100に調整
+      fontSize: '20px', // フォントサイズを20pxに縮小
       color: resultColor,
       fontStyle: 'bold'
     }).setOrigin(0.5);
@@ -337,8 +337,8 @@ export default class QuizScene extends Phaser.Scene {
 
     // 中段：選択と正解表示
     const choiceInfo = `選択：${this.userAnswer}\n正解：${this.currentQuestion.answer}`;
-    const choiceText = RetroUI.createSimpleText(this, 0, -80, choiceInfo, {
-      fontSize: '16px',
+    const choiceText = RetroUI.createSimpleText(this, 0, -50, choiceInfo, { // Y座標を-50に調整
+      fontSize: '14px', // フォントサイズを14pxに縮小
       align: 'center'
     }).setOrigin(0.5);
 
@@ -348,8 +348,8 @@ export default class QuizScene extends Phaser.Scene {
     this.showSourceInfo();
 
     // 操作説明
-    const instructionText = RetroUI.createSimpleText(this, 0, 140, 'Enter / Space / Esc キーで閉じる', {
-      fontSize: '14px',
+    const instructionText = RetroUI.createSimpleText(this, 0, 130, 'Enter / Space / Esc キーで閉じる', { // Y座標を130に調整
+      fontSize: '12px', // フォントサイズを12pxに縮小
       color: '#cccccc', // デフォルトの白ではなく、灰色を指定
       wordWrap: { width: 534 } // useAdvancedWrapを削除
     }).setOrigin(0.5);
@@ -373,15 +373,15 @@ export default class QuizScene extends Phaser.Scene {
       sourceInfo += '不明';
     }
 
-    const sourceText = RetroUI.createSimpleText(this, 0, -20, sourceInfo, {
-      fontSize: '14px'
+    const sourceText = RetroUI.createSimpleText(this, 0, -25, sourceInfo, { // Y座標を-25に調整
+      fontSize: '12px' // フォントサイズを12pxに縮小
     }).setOrigin(0.5);
 
     this.resultPanel.add(sourceText);
 
     // 区切り線
-    const separator = RetroUI.createSimpleText(this, 0, 0, '─'.repeat(40), {
-      fontSize: '12px',
+    const separator = RetroUI.createSimpleText(this, 0, -10, '─'.repeat(40), { // Y座標を-10に調整
+      fontSize: '10px', // フォントサイズを10pxに縮小
       color: '#666666'
     }).setOrigin(0.5);
 
@@ -397,11 +397,15 @@ export default class QuizScene extends Phaser.Scene {
     // スクロール可能なテキストエリアの定義
     const scrollAreaWidth = 500;
     const scrollAreaHeight = 100;
-    const scrollAreaYOffset = 60; // resultPanelの中心からのオフセット
+    const scrollAreaYOffset = 50; // resultPanelの中心からのオフセットを50に調整
 
     // テキストコンテナ
     const textContainer = this.add.container(0, scrollAreaYOffset);
     this.resultPanel.add(textContainer);
+
+    // チャンクの背景色
+    const chunkBg = this.add.rectangle(0, 0, scrollAreaWidth, scrollAreaHeight, 0x1a1a1a, 0.8).setOrigin(0.5); // 微妙に異なる背景色
+    textContainer.add(chunkBg);
 
     // チャンクテキスト
     const chunkText = this.add.text(

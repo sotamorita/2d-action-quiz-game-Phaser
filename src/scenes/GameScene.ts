@@ -116,21 +116,24 @@ export default class GameScene extends Phaser.Scene {
     const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     escKey.on('down', this.onEscKey, this);
 
-    // Background image (tiled to cover the entire world)
-    const background = this.add.tileSprite(0, 80, 1600, 320, 'background');
+    // Background image (tiled to cover the game area)
+    const background = this.add.tileSprite(0, 0, 1600, 320, 'background'); // 背景画像の高さを320に調整
     background.setOrigin(0, 0);
+
+    // 黒帯の描画 (背景画像の上に重ねる)
+    this.add.rectangle(0, 300, this.game.config.width as number, 20, 0x000000).setOrigin(0, 0).setScrollFactor(0);
 
     // World & camera
     const mapWidth = 1600;
-    const mapHeight = 400;
+    const mapHeight = 300; // ゲームのワールドの高さを300に合わせる (地面のY座標)
     this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
-    // Ground (positioned slightly above the bottom of the background image)
+    // Ground (positioned at Y=300)
     this.platforms = this.physics.add.staticGroup();
     // Create multiple platforms across the world width
     for (let x = 200; x <= 1400; x += 400) {
-      this.platforms.create(x, 380, 'ground').setScale(2).refreshBody();
+      this.platforms.create(x, 260, 'ground').setScale(2).refreshBody(); // 地面の位置を260に調整
     }
 
     // Load map objects
@@ -187,8 +190,13 @@ export default class GameScene extends Phaser.Scene {
       fontSize: '16px'
     }).setScrollFactor(0);
 
-    this.hpText = RetroUI.createSimpleText(this, 16, 40, `HP: ${this.player.health}`, {
+    this.hpText = RetroUI.createSimpleText(this, 16, 32, `HP: ${this.player.health}`, {
       fontSize: '16px'
+    }).setScrollFactor(0);
+
+    // 操作説明の追加
+    RetroUI.createSimpleText(this, 16, 305, '基本操作: [矢印キー/WASD] 移動 / ゲーム: [S]セーブ [L]ロード [R]リセット [Q]タイトル', { // 操作説明を1行にまとめ、Y座標を調整
+      fontSize: '12px' // フォントサイズを12pxに拡大
     }).setScrollFactor(0);
 
     // Groups

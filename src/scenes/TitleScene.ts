@@ -35,18 +35,18 @@ export default class TitleScene extends Phaser.Scene {
     this.selectedIndex = 0;
 
     // レトロ風UIパネル作成
-    const { overlay, panel } = RetroUI.createPanel(this, 320, 200, 400, 250);
+    const { overlay, panel } = RetroUI.createPanel(this, 320, 160, 400, 250); // Y座標を160に調整
     this.panel = panel;
 
     // タイトルテキスト
-    RetroUI.createTitle(this, this.panel, 'レトロ・クイズ・アクション', -80, '28px');
+    RetroUI.createTitle(this, this.panel, 'レトロ・クイズ・アクション', -60, '28px'); // Y座標を-60に調整
 
     // メニューアイテム作成
     this.menuItems = RetroUI.createMenuItems(
       this,
       this.menuOptions,
       this.panel,
-      -20,
+      0, // Y座標を0に調整
       40,
       '24px'
     );
@@ -68,7 +68,7 @@ export default class TitleScene extends Phaser.Scene {
       this,
       this.panel,
       '↑/↓: 選択  Enter: 決定',
-      60,
+      40, // Y座標を40に調整
       '14px'
     );
 

@@ -54,18 +54,18 @@ export default class PauseOverlayScene extends Phaser.Scene {
 
   create() {
     // レトロ風UIパネル作成
-    const { overlay, panel } = RetroUI.createPanel(this, 320, 200, 350, 280, 0.7);
+    const { overlay, panel } = RetroUI.createPanel(this, 320, 160, 350, 280, 0.7); // Y座標を160に調整
     this.panel = panel;
 
     // タイトルテキスト
-    RetroUI.createTitle(this, this.panel, 'ポーズ', -100, '32px');
+    RetroUI.createTitle(this, this.panel, 'ポーズ', -80, '32px'); // Y座標を-80に調整
 
     // メニューアイテム作成
     this.menuItems = RetroUI.createMenuItems(
       this,
       this.menuOptions,
       this.panel,
-      -40,
+      -20, // Y座標を-20に調整
       35,
       '20px'
     );
@@ -93,14 +93,14 @@ export default class PauseOverlayScene extends Phaser.Scene {
       this,
       this.panel,
       '↑/↓: 選択  Enter: 決定',
-      80,
+      80, // Y座標を80に調整
       '14px'
     );
     RetroUI.createInstructionText(
       this,
       this.panel,
       'ESC: コンティニュー  R: リトライ  T: タイトル',
-      100,
+      100, // Y座標を100に調整
       '14px'
     );
 

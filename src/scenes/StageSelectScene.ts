@@ -60,18 +60,18 @@ export default class StageSelectScene extends Phaser.Scene {
     this.selectedIndex = 0;
 
     // レトロ風UIパネル作成
-    const { overlay, panel } = RetroUI.createPanel(this, 320, 200, 400, 300); // 高さを250から300に増加
+    const { overlay, panel } = RetroUI.createPanel(this, 320, 160, 400, 250); // 高さを250に調整
     this.panel = panel;
 
     // タイトルテキスト
-    RetroUI.createTitle(this, this.panel, 'ステージセレクト', -80, '28px');
+    RetroUI.createTitle(this, this.panel, 'ステージセレクト', -60, '28px'); // Y座標を-60に調整
 
     // メニューアイテム作成
     this.menuItems = RetroUI.createMenuItems(
       this,
       this.stages.map(s => s.name),
       this.panel,
-      -20,
+      0, // Y座標を0に調整
       40,
       '24px'
     );
@@ -82,7 +82,7 @@ export default class StageSelectScene extends Phaser.Scene {
       this,
       this.panel,
       '↑/↓: 移動',
-      60, // 最初の行のY座標
+      40, // 最初の行のY座標を40に調整
       '14px',
       '#cccccc',
       380
@@ -91,7 +91,7 @@ export default class StageSelectScene extends Phaser.Scene {
       this,
       this.panel,
       '1: 直接選択',
-      80, // 2行目のY座標
+      60, // 2行目のY座標を60に調整
       '14px',
       '#cccccc',
       380
@@ -100,7 +100,7 @@ export default class StageSelectScene extends Phaser.Scene {
       this,
       this.panel,
       'Enter: 決定',
-      100, // 3行目のY座標
+      80, // 3行目のY座標を80に調整
       '14px',
       '#cccccc',
       380
@@ -109,7 +109,7 @@ export default class StageSelectScene extends Phaser.Scene {
       this,
       this.panel,
       'Esc: タイトルに戻る',
-      120, // 4行目のY座標
+      100, // 4行目のY座標を100に調整
       '14px',
       '#cccccc',
       380

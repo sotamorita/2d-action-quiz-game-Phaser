@@ -63,14 +63,14 @@ export default class ClearScene extends Phaser.Scene {
 
   create() {
     // レトロ風UIパネル作成
-    const { overlay, panel } = RetroUI.createPanel(this, 320, 200, 400, 320);
+    const { overlay, panel } = RetroUI.createPanel(this, 320, 160, 400, 250); // 高さを250に調整
     this.panel = panel;
 
     // メインタイトル「STAGE CLEAR!」
-    RetroUI.createTitle(this, this.panel, 'STAGE CLEAR!', -120, '36px', '#00ff00');
+    RetroUI.createTitle(this, this.panel, 'STAGE CLEAR!', -80, '36px', '#00ff00'); // Y座標を-80に調整
 
     // スコア表示
-    this.add.text(0, -70, `SCORE: ${this.score}`, {
+    this.add.text(0, -30, `SCORE: ${this.score}`, { // Y座標を-30に調整
       fontSize: '28px',
       color: '#ffff00'
     }).setOrigin(0.5);
@@ -81,7 +81,7 @@ export default class ClearScene extends Phaser.Scene {
       this,
       this.menuOptions,
       this.panel,
-      -10,
+      0, // Y座標を0に調整
       35,
       '20px',
       380 // wordWrapWidthを追加
@@ -108,7 +108,7 @@ export default class ClearScene extends Phaser.Scene {
       this,
       this.panel,
       '↑/↓: 選択  Enter: 決定\nR: 再挑戦  T: タイトル',
-      100,
+      80, // Y座標を80に調整
       '14px',
       '#cccccc', // colorを明示的に指定
       380 // wordWrapWidth

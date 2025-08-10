@@ -11,7 +11,7 @@
           "name": "",
           "type": "player",
           "x": 100,
-          "y": 380,
+          "y": 250,
           "properties": [
             { "name": "speed", "type": "int", "value": 200 },
             { "name": "jumpForce", "type": "int", "value": 360 },
@@ -23,7 +23,7 @@
           "name": "",
           "type": "enemy",
           "x": 600,
-          "y": 330,
+          "y": 190,
           "properties": [
             { "name": "speed", "type": "int", "value": 100 },
             { "name": "health", "type": "int", "value": 3 },
@@ -35,7 +35,7 @@
           "name": "",
           "type": "coin",
           "x": 300,
-          "y": 330,
+          "y": 190,
           "properties": [
             { "name": "value", "type": "int", "value": 10 },
             { "name": "spinSpeed", "type": "int", "value": 2 }
@@ -46,7 +46,7 @@
           "name": "",
           "type": "key",
           "x": 800,
-          "y": 330,
+          "y": 190,
           "properties": [
             { "name": "keyId", "type": "string", "value": "door1" },
             { "name": "color", "type": "string", "value": "gold" }
@@ -56,8 +56,8 @@
           "id": 5,
           "name": "",
           "type": "castle",
-          "x": 1500,
-          "y": 380,
+          "x": 1550,
+          "y": 278,
           "properties": [
             { "name": "level", "type": "int", "value": 1 },
             { "name": "requiredKeys", "type": "int", "value": 3 }
@@ -68,7 +68,7 @@
           "name": "",
           "type": "heart",
           "x": 500,
-          "y": 330,
+          "y": 190,
           "properties": [
             { "name": "healAmount", "type": "int", "value": 1 }
           ]
