@@ -92,8 +92,15 @@ export default class PauseOverlayScene extends Phaser.Scene {
     RetroUI.createInstructionText(
       this,
       this.panel,
-      '↑/↓: 選択  Enter: 決定\nESC: コンティニュー  R: リトライ  T: タイトル',
-      90,
+      '↑/↓: 選択  Enter: 決定',
+      80,
+      '14px'
+    );
+    RetroUI.createInstructionText(
+      this,
+      this.panel,
+      'ESC: コンティニュー  R: リトライ  T: タイトル',
+      100,
       '14px'
     );
 
