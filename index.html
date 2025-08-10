@@ -5,8 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Phaser Game</title>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #242424; /* 背景色を統一 */
+    }
+    #game-container {
+      margin: auto;
+      display: flex; /* Phaserキャンバスを中央に配置するため */
+      justify-content: center;
+      align-items: center;
+      border: 2px solid #777; /* 細めのピクセルアート風の枠線 */
+      box-shadow: 4px 4px 0px #333, 8px 8px 0px #222; /* 二重のピクセル影 */
+      padding: 5px; /* 枠線とゲーム画面の間に余白 */
+      background-color: #333; /* 枠内の背景色 */
+    }
+    canvas {
+      display: block; /* キャンバスの下に余白ができないように */
+    }
+  </style>
 </head>
 <body>
+  <div id="game-container"></div>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

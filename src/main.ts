@@ -11,6 +11,7 @@ const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: 640,
   height: 400,
+  parent: 'game-container', // ゲームキャンバスを配置する要素のID
   physics: {
     default: 'arcade',
     arcade: {
