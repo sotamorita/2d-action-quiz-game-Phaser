@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { CommonBackground } from '../ui/CommonBackground';
+import { RetroUI } from '../ui/RetroUI';
 
 interface GameOverSceneData {
   stageId: string;
@@ -11,6 +11,7 @@ export default class GameOverScene extends Phaser.Scene {
   private stageId!: string;
   private mapPath!: string;
   private score!: number;
+  private panel!: Phaser.GameObjects.Container;
 
   // キー入力ハンドラー（クリーンアップ用）
   private onRKey = () => {
@@ -50,54 +51,38 @@ export default class GameOverScene extends Phaser.Scene {
     }
   }
 
-  preload() {
-    // 共通背景アセットを読み込み
-    CommonBackground.preloadBackgroundAssets(this);
-  }
-
   create() {
-    // 共通背景描画
-    CommonBackground.drawGameBackground(this);
+    // レトロ風UIパネル作成
+    const { overlay, panel } = RetroUI.createPanel(this, 320, 200, 400, 320);
+    this.panel = panel;
 
     // メインタイトル「GAME OVER」
-    this.add.text(320, 120, 'GAME OVER', {
-      fontSize: '48px',
-      color: '#ff4444',
-      fontFamily: 'Arial'
-    }).setOrigin(0.5).setScrollFactor(0);
+    RetroUI.createTitle(this, this.panel, 'GAME OVER', -120, '48px', '#ff4444');
 
     // スコア表示
-    this.add.text(320, 180, `SCORE: ${this.score}`, {
+    this.add.text(0, -70, `SCORE: ${this.score}`, {
       fontSize: '32px',
-      color: '#ffff00',
-      fontFamily: 'Arial'
-    }).setOrigin(0.5).setScrollFactor(0);
+      color: '#ffff00'
+    }).setOrigin(0.5);
+    this.panel.add(this.panel.list[this.panel.list.length - 1]);
 
     // 操作説明
-    this.add.text(320, 240, '操作:', {
-      fontSize: '24px',
-      color: '#ffffff',
-      fontFamily: 'Arial'
-    }).setOrigin(0.5).setScrollFactor(0);
-
-    this.add.text(320, 270, 'R - 再挑戦', {
-      fontSize: '20px',
-      color: '#ffffff',
-      fontFamily: 'Arial'
-    }).setOrigin(0.5).setScrollFactor(0);
-
-    this.add.text(320, 295, 'T - タイトルへ戻る', {
-      fontSize: '20px',
-      color: '#ffffff',
-      fontFamily: 'Arial'
-    }).setOrigin(0.5).setScrollFactor(0);
+    RetroUI.createInstructionText(
+      this,
+      this.panel,
+      '操作:\nR - 再挑戦\nT - タイトルへ戻る',
+      60,
+      '20px'
+    );
 
     // 将来のStageSelect対応用コメント
-    // this.add.text(320, 320, 'M - ステージ選択', {
-    //   fontSize: '20px',
-    //   color: '#ffffff',
-    //   fontFamily: 'Arial'
-    // }).setOrigin(0.5).setScrollFactor(0);
+    // RetroUI.createInstructionText(
+    //   this,
+    //   this.panel,
+    //   'M - ステージ選択',
+    //   120,
+    //   '20px'
+    // );
 
     // キー入力設定
     const rKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.R);

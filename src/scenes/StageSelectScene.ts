@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-import { CommonBackground } from '../ui/CommonBackground';
+import { RetroUI } from '../ui/RetroUI';
 
 export default class StageSelectScene extends Phaser.Scene {
   private selectedIndex = 0;
   private menuItems: Phaser.GameObjects.Text[] = [];
   private stages = [{ id: 'level1', name: 'レベル１', mapPath: 'assets/maps/level1.json' }];
+  private panel!: Phaser.GameObjects.Container;
 
   // キー入力ハンドラー（クリーンアップ用）
   private onUpKey = () => {
@@ -47,12 +48,9 @@ export default class StageSelectScene extends Phaser.Scene {
   }
 
   preload() {
-    // テクスチャ存在チェック
+    // テクスチャ存在チェック（RetroUIは背景を扱わないため、CommonBackgroundのプリロードは不要）
     if (!this.textures.exists('ground')) {
       this.load.image('ground', 'assets/platform.png');
-    }
-    if (!this.textures.exists('background')) {
-      this.load.image('background', 'assets/maps/background.png');
     }
   }
 
@@ -61,25 +59,31 @@ export default class StageSelectScene extends Phaser.Scene {
     this.menuItems = [];
     this.selectedIndex = 0;
 
-    // 共通背景描画
-    CommonBackground.drawGameBackground(this);
+    // レトロ風UIパネル作成
+    const { overlay, panel } = RetroUI.createPanel(this, 320, 200, 400, 250);
+    this.panel = panel;
 
     // タイトルテキスト
-    const titleText = this.add.text(320, 120, 'ステージセレクト', {
-      fontSize: '28px',
-      color: '#ffffff',
-      fontFamily: 'Arial'
-    }).setOrigin(0.5).setScrollFactor(0);
+    RetroUI.createTitle(this, this.panel, 'ステージセレクト', -80, '28px');
 
-    // メニュー作成
-    this.createMenu();
+    // メニューアイテム作成
+    this.menuItems = RetroUI.createMenuItems(
+      this,
+      this.stages.map(s => s.name),
+      this.panel,
+      -20,
+      40,
+      '24px'
+    );
 
     // 操作説明
-    const instructionText = this.add.text(320, 320, '↑/↓: 移動  1: 直接選択  Enter: 決定  Esc: タイトルに戻る', {
-      fontSize: '16px',
-      color: '#ffffff',
-      fontFamily: 'Arial'
-    }).setOrigin(0.5).setScrollFactor(0);
+    RetroUI.createInstructionText(
+      this,
+      this.panel,
+      '↑/↓: 移動  1: 直接選択  Enter: 決定  Esc: タイトルに戻る',
+      60,
+      '16px'
+    );
 
     // キー入力設定
     const upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -102,51 +106,8 @@ export default class StageSelectScene extends Phaser.Scene {
     this.events.once('destroy', this.cleanup, this);
   }
 
-  private createMenu() {
-    const startY = 200;
-    const spacing = 40;
-
-    this.stages.forEach((stage, index) => {
-      const menuText = this.add.text(320, startY + (index * spacing), stage.name, {
-        fontSize: '24px',
-        color: '#ffffff',
-        fontFamily: 'Arial'
-      }).setOrigin(0.5).setScrollFactor(0);
-
-      this.menuItems.push(menuText);
-    });
-  }
-
   private updateMenuHighlight() {
-    // メニューアイテムが存在しない場合は何もしない
-    if (!this.menuItems || this.menuItems.length === 0) {
-      return;
-    }
-
-    this.menuItems.forEach((item, index) => {
-      // アイテムが有効かチェック
-      if (!item || !item.active) {
-        return;
-      }
-
-      if (index === this.selectedIndex) {
-        // 選択中：黄色背景 + 黒文字
-        item.setStyle({
-          fontSize: '24px',
-          color: '#000000',
-          backgroundColor: '#ffff00',
-          padding: { x: 10, y: 5 }
-        });
-      } else {
-        // 非選択：白文字
-        item.setStyle({
-          fontSize: '24px',
-          color: '#ffffff',
-          backgroundColor: 'transparent',
-          padding: { x: 0, y: 0 }
-        });
-      }
-    });
+    RetroUI.updateSelection(this.menuItems, this.selectedIndex, this.stages.map(s => s.name));
   }
 
   private cleanup() {
