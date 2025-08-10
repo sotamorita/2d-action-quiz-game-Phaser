@@ -389,18 +389,72 @@ export default class QuizScene extends Phaser.Scene {
 
     // source_chunk（300-500字に整形）
     let chunk = this.currentQuestion.source_chunk;
+    // \n, \r, \t, \ のエスケープ処理を削除し、Phaserが改行として解釈するようにする
     if (chunk.length > 500) {
       chunk = chunk.substring(0, 497) + '...';
     }
 
-    const chunkText = RetroUI.createSimpleText(this, 0, 60, chunk, {
-      fontSize: '12px',
-      color: '#dddddd',
-      align: 'center',
-      wordWrap: { width: 534 } // 幅を534に調整
-    }).setOrigin(0.5);
+    // スクロール可能なテキストエリアの定義
+    const scrollAreaWidth = 500;
+    const scrollAreaHeight = 100;
+    const scrollAreaYOffset = 60; // resultPanelの中心からのオフセット
 
-    this.resultPanel.add(chunkText);
+    // テキストコンテナ
+    const textContainer = this.add.container(0, scrollAreaYOffset);
+    this.resultPanel.add(textContainer);
+
+    // チャンクテキスト
+    const chunkText = this.add.text(
+      -scrollAreaWidth / 2, // コンテナの左端に配置
+      -scrollAreaHeight / 2, // コンテナの上端に配置
+      chunk,
+      {
+        fontSize: '12px',
+        fontFamily: 'DotGothic16, sans-serif',
+        color: '#dddddd',
+        align: 'left',
+        wordWrap: { width: scrollAreaWidth, useAdvancedWrap: true },
+        lineSpacing: 5
+      }
+    ).setOrigin(0); // 左上を原点に
+
+    textContainer.add(chunkText);
+
+    // マスクの作成
+    const maskGraphics = this.make.graphics({}).setScrollFactor(0);
+    maskGraphics.fillRect(
+      this.resultPanel.x - scrollAreaWidth / 2,
+      this.resultPanel.y + scrollAreaYOffset - scrollAreaHeight / 2,
+      scrollAreaWidth,
+      scrollAreaHeight
+    );
+    textContainer.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGraphics));
+
+    // スクロールロジック
+    this.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) => {
+      if (this.currentState === QuizState.RESULT && this.resultPanel.visible) {
+        // マウスカーソルがスクロールエリア内にあるかチェック
+        const bounds = new Phaser.Geom.Rectangle(
+          this.resultPanel.x - scrollAreaWidth / 2,
+          this.resultPanel.y + scrollAreaYOffset - scrollAreaHeight / 2,
+          scrollAreaWidth,
+          scrollAreaHeight
+        );
+        if (bounds.contains(pointer.x, pointer.y)) {
+          textContainer.y -= deltaY * 0.1; // スクロール速度調整
+
+          // スクロール範囲の制限
+          const maxScrollY = scrollAreaYOffset; // 上限はtextContainerの初期Y座標
+          const minScrollY = scrollAreaYOffset + scrollAreaHeight - chunkText.displayHeight; // 下限
+
+          if (textContainer.y > maxScrollY) {
+            textContainer.y = maxScrollY;
+          } else if (textContainer.y < minScrollY) {
+            textContainer.y = minScrollY;
+          }
+        }
+      }
+    });
   }
 
   private setupResultInputHandlers(): void {
