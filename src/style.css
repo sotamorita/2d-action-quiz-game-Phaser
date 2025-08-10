@@ -28,9 +28,6 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  /* ゲームキャンバスを中央に配置するためのスタイル */
-  /* justify-content: center; */ /* index.htmlのstyleタグで定義するためコメントアウト */
-  /* align-items: center; */ /* index.htmlのstyleタグで定義するためコメントアウト */
 }
 
 h1 {
@@ -43,11 +40,6 @@ h1 {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-}
-
-#game-container {
-  /* ゲームキャンバスを中央に配置するためのスタイル */
-  /* margin: auto; */ /* index.htmlのstyleタグで定義するためコメントアウト */
 }
 
 .logo {
