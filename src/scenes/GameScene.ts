@@ -184,11 +184,11 @@ export default class GameScene extends Phaser.Scene {
 
     // --- UI first (avoid race if overlaps fire immediately) ---
     this.scoreText = RetroUI.createSimpleText(this, 16, 16, 'Score: 0', {
-      fontSize: '20px'
+      fontSize: '16px'
     }).setScrollFactor(0);
 
     this.hpText = RetroUI.createSimpleText(this, 16, 40, `HP: ${this.player.health}`, {
-      fontSize: '20px'
+      fontSize: '16px'
     }).setScrollFactor(0);
 
     // Groups
