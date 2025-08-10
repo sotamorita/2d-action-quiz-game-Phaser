@@ -12,6 +12,19 @@ const config: Phaser.Types.Core.GameConfig = {
   width: 640,
   height: 320,
   parent: 'game-container', // ゲームキャンバスを配置する要素のID
+  scale: {
+    mode: Phaser.Scale.FIT, // アスペクト比を維持しながらフィット
+    autoCenter: Phaser.Scale.CENTER_BOTH, // 中央配置
+    width: 640,
+    height: 320,
+    max: {
+      width: 640,
+      height: 320
+    }
+  },
+  render: {
+    pixelArt: true
+  },
   physics: {
     default: 'arcade',
     arcade: {
@@ -21,5 +34,18 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [TitleScene, StageSelectScene, GameScene, QuizScene, ClearScene, GameOverScene, PauseOverlayScene]
 };
 
+const game = new Phaser.Game(config);
 
-new Phaser.Game(config);
+// ゲームが初期化された後にスタイルを動的に適用
+game.events.once('ready', () => {
+  // bodyの背景色を設定（装飾は削除してシンプルに）
+  document.body.style.margin = '0';
+  document.body.style.padding = '0';
+  document.body.style.backgroundColor = '#242424'; // ダークグレーの背景
+  document.body.style.width = '100%';
+  document.body.style.height = '100vh';
+  document.body.style.display = 'flex';
+  document.body.style.justifyContent = 'center';
+  document.body.style.alignItems = 'center';
+  document.body.style.overflow = 'hidden';
+});

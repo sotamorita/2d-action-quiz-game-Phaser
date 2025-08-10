@@ -63,14 +63,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  update() {
+  update(leftIsDown: boolean, rightIsDown: boolean, jumpIsDown: boolean) {
     const body = this.body as Phaser.Physics.Arcade.Body;
 
     // 横移動
-    if (this.cursors.left?.isDown) {
+    if (leftIsDown) {
       this.setVelocityX(-this.speed);
       this.anims.play('left', true);
-    } else if (this.cursors.right?.isDown) {
+    } else if (rightIsDown) {
       this.setVelocityX(this.speed);
       this.anims.play('right', true);
     } else if (body.blocked.down) {
@@ -80,10 +80,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     // ジャンプ（地面にいるときのみ）
-    if (
-      (this.cursors.up?.isDown || this.cursors.space?.isDown) &&
-      body.blocked.down
-    ) {
+    if (jumpIsDown && body.blocked.down) {
       this.setVelocityY(-this.jumpForce);
     }
   }

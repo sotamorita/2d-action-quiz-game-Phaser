@@ -7,10 +7,12 @@ import Castle from '../objects/Castle';
 import MapLoader from '../objects/MapLoader';
 import Heart from '../objects/Heart';
 import { RetroUI } from '../ui/RetroUI';
+import VirtualControls from '../ui/VirtualControls'; // VirtualControlsをインポート
 
 export default class GameScene extends Phaser.Scene {
   player!: Player;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  virtualControls?: VirtualControls; // VirtualControlsのインスタンス
 
   platforms!: Phaser.Physics.Arcade.StaticGroup;
 
@@ -112,9 +114,18 @@ export default class GameScene extends Phaser.Scene {
     // Keyboard
     this.cursors = this.input.keyboard!.createCursorKeys();
 
-    // Escキー設定（PauseOverlayScene呼び出し用）
-    const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-    escKey.on('down', this.onEscKey, this);
+    // モバイルデバイス検出
+    const isMobile = this.sys.game.device.os.android || this.sys.game.device.os.iOS;
+
+    if (isMobile) {
+      this.virtualControls = new VirtualControls(this);
+      this.virtualControls.setVisible(true); // モバイルの場合のみ表示
+      this.events.on('virtual-pause-button-down', this.onEscKey, this); // バーチャルポーズボタンのイベントを購読
+    } else {
+      // デスクトップの場合、Escキー設定（PauseOverlayScene呼び出し用）
+      const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+      escKey.on('down', this.onEscKey, this);
+    }
 
     // Background image (tiled to cover the game area)
     const background = this.add.tileSprite(0, 0, 1600, 320, 'background'); // 背景画像の高さを320に調整
@@ -274,7 +285,13 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update() {
-    this.player.update();
+    // キーボード入力とバーチャルコントロール入力を統合
+    const leftIsDown = this.cursors.left?.isDown || this.virtualControls?.left.isDown || false;
+    const rightIsDown = this.cursors.right?.isDown || this.virtualControls?.right.isDown || false;
+    const jumpIsDown = (this.cursors.up?.isDown || this.cursors.space?.isDown) || this.virtualControls?.jump.isDown || false;
+
+    // Playerのupdateメソッドに統合された入力状態を渡す
+    this.player.update(leftIsDown, rightIsDown, jumpIsDown);
     this.hpText.setText(`HP: ${this.player.health}`);
   }
 
@@ -356,8 +373,15 @@ export default class GameScene extends Phaser.Scene {
     this.events.off('resume', this.onSceneResume, this);
 
     // Off key events
-    const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-    escKey.off('down', this.onEscKey, this);
+    // モバイルとデスクトップで異なるクリーンアップ
+    const isMobile = this.sys.game.device.os.android || this.sys.game.device.os.iOS;
+    if (isMobile) {
+      this.events.off('virtual-pause-button-down', this.onEscKey, this);
+      this.virtualControls?.destroy(); // バーチャルコントロールを破棄
+    } else {
+      const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+      escKey.off('down', this.onEscKey, this);
+    }
 
     // Destroy colliders
     this.enemyCollider?.destroy();

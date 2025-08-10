@@ -29,13 +29,23 @@ export default class TitleScene extends Phaser.Scene {
     super('TitleScene');
   }
 
+  preload() {
+    // 背景画像を読み込み
+    if (!this.textures.exists('background')) {
+      this.load.image('background', 'assets/maps/background.png');
+    }
+  }
+
   create() {
     // 初期化：配列をクリア
     this.menuItems = [];
     this.selectedIndex = 0;
 
-    // レトロ風UIパネル作成
-    const { overlay, panel } = RetroUI.createPanel(this, 320, 160, 400, 250); // Y座標を160に調整
+    // 背景画像を追加
+    this.add.image(320, 160, 'background');
+
+    // レトロ風UIパネル作成（アルファ値を0.7に変更）
+    const { overlay, panel } = RetroUI.createPanel(this, 320, 160, 400, 250, 0.7); // Y座標を160に調整、アルファ値を0.7に
     this.panel = panel;
 
     // タイトルテキスト
@@ -50,6 +60,16 @@ export default class TitleScene extends Phaser.Scene {
       40,
       '24px'
     );
+
+    // メニュー項目にタップイベントを追加
+    this.menuItems.forEach((item, index) => {
+      item.setInteractive({ useHandCursor: true });
+      item.on('pointerdown', () => {
+        this.selectedIndex = index;
+        this.updateMenuHighlight();
+        this.onEnterKey(); // タップで即時決定
+      });
+    });
 
     // キー入力設定
     const upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);

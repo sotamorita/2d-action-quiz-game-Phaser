@@ -48,6 +48,10 @@ export default class StageSelectScene extends Phaser.Scene {
   }
 
   preload() {
+    // 背景画像を読み込み
+    if (!this.textures.exists('background')) {
+      this.load.image('background', 'assets/maps/background.png');
+    }
     // テクスチャ存在チェック（RetroUIは背景を扱わないため、CommonBackgroundのプリロードは不要）
     if (!this.textures.exists('ground')) {
       this.load.image('ground', 'assets/platform.png');
@@ -59,8 +63,11 @@ export default class StageSelectScene extends Phaser.Scene {
     this.menuItems = [];
     this.selectedIndex = 0;
 
-    // レトロ風UIパネル作成
-    const { overlay, panel } = RetroUI.createPanel(this, 320, 160, 400, 250); // 高さを250に調整
+    // 背景画像を追加
+    this.add.image(320, 160, 'background');
+
+    // レトロ風UIパネル作成（アルファ値を0.7に変更）
+    const { overlay, panel } = RetroUI.createPanel(this, 320, 160, 400, 250, 0.7); // 高さを250に調整、アルファ値を0.7に
     this.panel = panel;
 
     // タイトルテキスト
@@ -75,6 +82,16 @@ export default class StageSelectScene extends Phaser.Scene {
       40,
       '24px'
     );
+
+    // メニュー項目にタップイベントを追加
+    this.menuItems.forEach((item, index) => {
+      item.setInteractive({ useHandCursor: true });
+      item.on('pointerdown', () => {
+        this.selectedIndex = index;
+        this.updateMenuHighlight();
+        this.onEnterKey(); // タップで即時決定
+      });
+    });
 
     // 操作説明
     // 以前の単一のテキストを分割し、それぞれを独立したテキストオブジェクトとして作成

@@ -218,7 +218,15 @@ export default class QuizScene extends Phaser.Scene {
         backgroundColor: 'rgba(0,0,0,0)',
         padding: { x: 10, y: 5 }
         // wordWrapはRetroUI.createSimpleTextのデフォルトを使用
-      }).setOrigin(0.5);
+      }).setOrigin(0.5)
+        .setInteractive({ useHandCursor: true }); // タップ可能にする
+
+      choiceText.on('pointerdown', () => {
+        if (this.inputLocked || this.currentState !== QuizState.QUESTION) return;
+        this.selectedIndex = index;
+        this.updateSelection();
+        this.confirmAnswer(); // タップで即時決定
+      });
 
       this.choiceTexts.push(choiceText);
       this.questionPanel.add(choiceText);
@@ -466,6 +474,9 @@ export default class QuizScene extends Phaser.Scene {
     this.registerKeyHandler('keydown-ENTER', () => this.closeQuiz());
     this.registerKeyHandler('keydown-SPACE', () => this.closeQuiz());
     this.registerKeyHandler('keydown-ESC', () => this.closeQuiz());
+
+    // 任意のタップで閉じる
+    this.input.once('pointerdown', () => this.closeQuiz(), this);
   }
 
   private closeQuiz(): void {
