@@ -130,7 +130,7 @@ export class RetroUI {
     container: Phaser.GameObjects.Container,
     text: string,
     y: number = 100,
-    fontSize: string = '12px',
+    fontSize: string = '14px',
     color: string = '#cccccc',
     wordWrapWidth?: number
   ): Phaser.GameObjects.Text {

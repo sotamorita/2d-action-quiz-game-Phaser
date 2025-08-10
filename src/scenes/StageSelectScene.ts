@@ -83,7 +83,7 @@ export default class StageSelectScene extends Phaser.Scene {
       this.panel,
       '↑/↓: 移動',
       60, // 最初の行のY座標
-      '16px',
+      '14px',
       '#cccccc',
       380
     );
@@ -92,7 +92,7 @@ export default class StageSelectScene extends Phaser.Scene {
       this.panel,
       '1: 直接選択',
       80, // 2行目のY座標
-      '16px',
+      '14px',
       '#cccccc',
       380
     );
@@ -101,7 +101,7 @@ export default class StageSelectScene extends Phaser.Scene {
       this.panel,
       'Enter: 決定',
       100, // 3行目のY座標
-      '16px',
+      '14px',
       '#cccccc',
       380
     );
@@ -110,7 +110,7 @@ export default class StageSelectScene extends Phaser.Scene {
       this.panel,
       'Esc: タイトルに戻る',
       120, // 4行目のY座標
-      '16px',
+      '14px',
       '#cccccc',
       380
     );

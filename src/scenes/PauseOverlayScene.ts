@@ -94,7 +94,7 @@ export default class PauseOverlayScene extends Phaser.Scene {
       this.panel,
       '↑/↓: 選択  Enter: 決定\nESC: コンティニュー  R: リトライ  T: タイトル',
       90,
-      '12px'
+      '14px'
     );
 
     // クリーンアップ設定

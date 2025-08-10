@@ -109,7 +109,7 @@ export default class ClearScene extends Phaser.Scene {
       this.panel,
       '↑/↓: 選択  Enter: 決定\nR: 再挑戦  T: タイトル',
       100,
-      '12px',
+      '14px',
       '#cccccc', // colorを明示的に指定
       380 // wordWrapWidth
     );
