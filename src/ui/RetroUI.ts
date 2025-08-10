@@ -46,6 +46,7 @@ export class RetroUI {
     options.forEach((option, index) => {
       const style: Phaser.Types.GameObjects.Text.TextStyle = {
         fontSize: fontSize,
+        fontFamily: 'DotGothic16, sans-serif',
         color: '#ffffff',
         backgroundColor: 'rgba(0,0,0,0)',
         padding: { x: 10, y: 5 }
@@ -113,6 +114,7 @@ export class RetroUI {
   ): Phaser.GameObjects.Text {
     const titleText = scene.add.text(0, y, text, {
       fontSize: fontSize,
+      fontFamily: 'DotGothic16, sans-serif',
       color: color
     }).setOrigin(0.5);
 
@@ -134,6 +136,7 @@ export class RetroUI {
   ): Phaser.GameObjects.Text {
     const style: Phaser.Types.GameObjects.Text.TextStyle = {
       fontSize: fontSize,
+      fontFamily: 'DotGothic16, sans-serif',
       color: color,
       align: 'center'
     };
@@ -146,5 +149,26 @@ export class RetroUI {
 
     container.add(instructionText);
     return instructionText;
+  }
+
+  /**
+   * 汎用的なテキストを作成（DotGothic16フォントをデフォルトで適用）
+   */
+  static createSimpleText(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    text: string,
+    style?: Phaser.Types.GameObjects.Text.TextStyle
+  ): Phaser.GameObjects.Text {
+    const defaultStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: 'DotGothic16, sans-serif',
+      color: '#ffffff', // デフォルトの色
+      fontSize: '16px', // デフォルトのフォントサイズ
+      wordWrap: { width: 484 }, // useAdvancedWrapをデフォルトから削除
+      lineSpacing: 5 // 行間を確保
+    };
+    const mergedStyle = { ...defaultStyle, ...style };
+    return scene.add.text(x, y, text, mergedStyle);
   }
 }

@@ -6,6 +6,7 @@ import Key from '../objects/Key';
 import Castle from '../objects/Castle';
 import MapLoader from '../objects/MapLoader';
 import Heart from '../objects/Heart';
+import { RetroUI } from '../ui/RetroUI';
 
 export default class GameScene extends Phaser.Scene {
   player!: Player;
@@ -182,14 +183,12 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // --- UI first (avoid race if overlaps fire immediately) ---
-    this.scoreText = this.add.text(16, 16, 'Score: 0', {
-      fontSize: '20px',
-      color: '#ffffff'
+    this.scoreText = RetroUI.createSimpleText(this, 16, 16, 'Score: 0', {
+      fontSize: '20px'
     }).setScrollFactor(0);
 
-    this.hpText = this.add.text(16, 40, `HP: ${this.player.health}`, {
-      fontSize: '20px',
-      color: '#ffffff'
+    this.hpText = RetroUI.createSimpleText(this, 16, 40, `HP: ${this.player.health}`, {
+      fontSize: '20px'
     }).setScrollFactor(0);
 
     // Groups

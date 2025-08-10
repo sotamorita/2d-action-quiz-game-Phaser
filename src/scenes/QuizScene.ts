@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { RetroUI } from '../ui/RetroUI';
 
 interface QuizData {
   question: string;
@@ -201,9 +202,8 @@ export default class QuizScene extends Phaser.Scene {
     this.currentState = QuizState.QUESTION;
 
     // 問題文表示
-    this.questionText = this.add.text(0, -100, this.currentQuestion.question, {
+    this.questionText = RetroUI.createSimpleText(this, 0, -100, this.currentQuestion.question, {
       fontSize: '18px',
-      color: '#ffffff',
       align: 'center',
       wordWrap: { width: 480, useAdvancedWrap: true } // wordWrapWidthを480に調整
     }).setOrigin(0.5);
@@ -213,12 +213,11 @@ export default class QuizScene extends Phaser.Scene {
     // 選択肢表示
     this.choiceTexts = [];
     this.currentQuestion.choices.forEach((choice, index) => {
-      const choiceText = this.add.text(0, -20 + index * 35, `${index + 1}. ${choice}`, {
+      const choiceText = RetroUI.createSimpleText(this, 0, -20 + index * 35, `${index + 1}. ${choice}`, {
         fontSize: '16px',
-        color: '#ffffff',
         backgroundColor: 'rgba(0,0,0,0)',
-        padding: { x: 10, y: 5 },
-        wordWrap: { width: 480, useAdvancedWrap: true } // wordWrapWidthを480に調整
+        padding: { x: 10, y: 5 }
+        // wordWrapはRetroUI.createSimpleTextのデフォルトを使用
       }).setOrigin(0.5);
 
       this.choiceTexts.push(choiceText);
@@ -328,7 +327,7 @@ export default class QuizScene extends Phaser.Scene {
     const resultColor = this.isCorrect ? '#00ff00' : '#ff0000';
     const resultMessage = this.isCorrect ? '正解！' : '不正解…';
 
-    const resultText = this.add.text(0, -140, resultMessage, {
+    const resultText = RetroUI.createSimpleText(this, 0, -140, resultMessage, {
       fontSize: '24px',
       color: resultColor,
       fontStyle: 'bold'
@@ -338,9 +337,8 @@ export default class QuizScene extends Phaser.Scene {
 
     // 中段：選択と正解表示
     const choiceInfo = `選択：${this.userAnswer}\n正解：${this.currentQuestion.answer}`;
-    const choiceText = this.add.text(0, -80, choiceInfo, {
+    const choiceText = RetroUI.createSimpleText(this, 0, -80, choiceInfo, {
       fontSize: '16px',
-      color: '#ffffff',
       align: 'center'
     }).setOrigin(0.5);
 
@@ -350,10 +348,10 @@ export default class QuizScene extends Phaser.Scene {
     this.showSourceInfo();
 
     // 操作説明
-    const instructionText = this.add.text(0, 140, 'Enter / Space / Esc キーで閉じる', {
+    const instructionText = RetroUI.createSimpleText(this, 0, 140, 'Enter / Space / Esc キーで閉じる', {
       fontSize: '14px',
-      color: '#cccccc',
-      wordWrap: { width: 500, useAdvancedWrap: true } // 追加
+      color: '#cccccc', // デフォルトの白ではなく、灰色を指定
+      wordWrap: { width: 534 } // useAdvancedWrapを削除
     }).setOrigin(0.5);
 
     this.resultPanel.add(instructionText);
@@ -375,15 +373,14 @@ export default class QuizScene extends Phaser.Scene {
       sourceInfo += '不明';
     }
 
-    const sourceText = this.add.text(0, -20, sourceInfo, {
-      fontSize: '14px',
-      color: '#ffffff'
+    const sourceText = RetroUI.createSimpleText(this, 0, -20, sourceInfo, {
+      fontSize: '14px'
     }).setOrigin(0.5);
 
     this.resultPanel.add(sourceText);
 
     // 区切り線
-    const separator = this.add.text(0, 0, '─'.repeat(40), {
+    const separator = RetroUI.createSimpleText(this, 0, 0, '─'.repeat(40), {
       fontSize: '12px',
       color: '#666666'
     }).setOrigin(0.5);
@@ -396,11 +393,11 @@ export default class QuizScene extends Phaser.Scene {
       chunk = chunk.substring(0, 497) + '...';
     }
 
-    const chunkText = this.add.text(0, 60, chunk, {
+    const chunkText = RetroUI.createSimpleText(this, 0, 60, chunk, {
       fontSize: '12px',
       color: '#dddddd',
       align: 'center',
-      wordWrap: { width: 480 }
+      wordWrap: { width: 534 } // 幅を534に調整
     }).setOrigin(0.5);
 
     this.resultPanel.add(chunkText);
