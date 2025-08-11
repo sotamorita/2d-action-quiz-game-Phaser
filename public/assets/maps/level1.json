@@ -55,6 +55,72 @@
           "type": "heart",
           "x": 500,
           "y": 190
+        },
+        {
+          "id": 10,
+          "name": "",
+          "properties": {},
+          "type": "ground",
+          "visible": true,
+          "width": 0,
+          "height": 0,
+          "x": 220,
+          "y": 250
+        },
+        {
+            "id": 11,
+            "name": "",
+            "properties": {},
+            "type": "ground",
+            "visible": true,
+            "width": 0,
+            "height": 0,
+            "x": 430,
+            "y": 220
+        },
+        {
+            "id": 12,
+            "name": "",
+            "properties": {},
+            "type": "ground",
+            "visible": true,
+            "width": 0,
+            "height": 0,
+            "x": 600,
+            "y": 260
+        },
+        {
+            "id": 13,
+            "name": "",
+            "properties": {},
+            "type": "ground",
+            "visible": true,
+            "width": 0,
+            "height": 0,
+            "x": 750,
+            "y": 240
+        },
+        {
+            "id": 14,
+            "name": "",
+            "properties": {},
+            "type": "ground",
+            "visible": true,
+            "width": 0,
+            "height": 0,
+            "x": 930,
+            "y": 180
+        },
+        {
+            "id": 15,
+            "name": "",
+            "properties": {},
+            "type": "ground",
+            "visible": true,
+            "width": 0,
+            "height": 0,
+            "x": 1350,
+            "y": 250
         }
       ]
     }

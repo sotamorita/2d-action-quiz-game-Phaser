@@ -163,9 +163,6 @@ export default class GameScene extends Phaser.Scene {
 
     // プラットフォームを生成
     this.platforms = this.physics.add.staticGroup();
-    for (let x = 200; x <= 1400; x += 400) {
-      this.platforms.create(x, 260, 'ground').setScale(2).refreshBody();
-    }
   }
 
   /**
@@ -215,6 +212,11 @@ export default class GameScene extends Phaser.Scene {
    * @param {MapObjects} mapObjects - MapLoaderによって解析されたオブジェクトデータ。
    */
   private createMapObjects(mapObjects: MapObjects): void {
+    // プラットフォームを生成
+    mapObjects.platforms.forEach(p => {
+      this.platforms.create(p.x, p.y, 'ground').setScale(2).refreshBody();
+    });
+
     // 敵を生成
     mapObjects.enemies.forEach(e => {
       const enemy = this.enemies.get(e.x, e.y) as Enemy;

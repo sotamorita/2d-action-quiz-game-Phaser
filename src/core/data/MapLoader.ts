@@ -65,6 +65,12 @@ export type CastleConfig = {
   properties: Record<string, any>;
 };
 
+export type PlatformConfig = {
+  x: number;
+  y: number;
+  properties: Record<string, any>;
+};
+
 // --- ローダーの返り値の型定義 ---
 
 /**
@@ -77,6 +83,7 @@ export type MapObjects = {
   hearts: HeartConfig[];
   keys: KeyConfig[];
   castles: CastleConfig[];
+  platforms: PlatformConfig[];
   backgroundKey: string;
 };
 
@@ -111,6 +118,7 @@ export default class MapLoader {
       hearts: [],
       keys: [],
       castles: [],
+      platforms: [],
       backgroundKey: tiledData.backgroundKey || 'background',
     };
 
@@ -145,6 +153,9 @@ export default class MapLoader {
           break;
         case 'castle':
           result.castles.push({ x: obj.x, y: obj.y, properties });
+          break;
+        case 'ground':
+          result.platforms.push({ x: obj.x, y: obj.y, properties });
           break;
         default:
           console.warn(`MapLoader: Unknown object type "${obj.type}" found.`);
