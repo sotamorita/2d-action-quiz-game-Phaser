@@ -23,6 +23,16 @@ export default class TitleScene extends Phaser.Scene {
     // 背景画像を追加
     this.add.image(centerX, centerY, 'background');
 
+    // 半透明のオーバーレイを追加
+    this.add.rectangle(
+      centerX,
+      centerY,
+      this.cameras.main.width,
+      this.cameras.main.height,
+      UIConstants.Overlay.BgColor,
+      0.4 // Alpha値を少し下げる
+    );
+
     // タイトルテキスト
     this.add.text(centerX, centerY - 80, '2Dアクション・クイズゲーム', {
       fontFamily: UIConstants.FontFamily,
