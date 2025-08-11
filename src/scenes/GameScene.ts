@@ -319,9 +319,12 @@ export default class GameScene extends Phaser.Scene {
     // Disable input to avoid double launch
     this.input.keyboard!.enabled = false;
 
+    // Registryから選択されたクイズカテゴリを取得
+    const category = this.registry.get('selectedQuizCategory') || 'general';
+
     this.scene.pause();
     this.scene.launch('QuizScene', {
-      category: 'general',
+      category: category,
       returnSceneKey: this.scene.key
     });
   };

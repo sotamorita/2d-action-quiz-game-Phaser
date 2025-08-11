@@ -59,7 +59,7 @@ export default class TitleScene extends Phaser.Scene {
         this.scene.start('StageSelectScene');
       } else if (index === 1) {
         // クイズ選択シーンへ
-        this.scene.start('QuizOnlyScene');
+        this.scene.start('QuizCategorySelectScene');
       }
     });
   }

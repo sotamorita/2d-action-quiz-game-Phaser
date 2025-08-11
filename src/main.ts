@@ -6,7 +6,7 @@ import QuizScene from './scenes/QuizScene';
 import ClearScene from './scenes/ClearScene';
 import GameOverScene from './scenes/GameOverScene';
 import PauseOverlayScene from './scenes/PauseOverlayScene';
-import QuizOnlyScene from './scenes/QuizOnlyScene';
+import QuizCategorySelectScene from './scenes/QuizCategorySelectScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -32,13 +32,16 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false
     }
   },
-  scene: [TitleScene, StageSelectScene, GameScene, QuizScene, ClearScene, GameOverScene, PauseOverlayScene, QuizOnlyScene]
+  scene: [TitleScene, StageSelectScene, GameScene, QuizScene, ClearScene, GameOverScene, PauseOverlayScene, QuizCategorySelectScene]
 };
 
 const game = new Phaser.Game(config);
 
 // ゲームが初期化された後にスタイルを動的に適用
 game.events.once('ready', () => {
+  // Registryにグローバルな初期値を設定
+  game.registry.set('selectedQuizCategory', 'general');
+
   // bodyの背景色を設定（装飾は削除してシンプルに）
   document.body.style.margin = '0';
   document.body.style.padding = '0';
