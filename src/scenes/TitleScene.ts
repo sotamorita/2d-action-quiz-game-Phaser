@@ -29,21 +29,23 @@ export default class TitleScene extends Phaser.Scene {
     );
 
     // タイトルテキスト
-    this.add.text(centerX, centerY - 80, '2Dアクション・クイズゲーム', {
+    const titleText = this.add.text(centerX, centerY - 80, '2Dアクション・クイズゲーム', {
       fontFamily: UIConstants.FontFamily,
       fontSize: '38px',
       color: UIConstants.Color.White,
       stroke: UIConstants.Color.Black,
-      strokeThickness: 8,
-      shadow: {
-        offsetX: 5,
-        offsetY: 5,
-        color: '#000',
-        blur: 5,
-        stroke: true,
-        fill: true
-      }
+      strokeThickness: 8
     }).setOrigin(0.5);
+
+    // タイトルを上下に動かすTweenアニメーション
+    this.tweens.add({
+      targets: titleText,
+      y: titleText.y + 5, // 5ピクセル上に動かす
+      duration: 3000,      // 3秒かける
+      ease: 'Sine.easeInOut',
+      yoyo: true,          // 元の位置に戻る
+      repeat: -1           // 無限に繰り返す
+    });
 
     // メニュー作成
     this.menu = new Menu(this, {
