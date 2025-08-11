@@ -27,7 +27,19 @@ export default class Coin extends BaseObject {
 
     this.setOrigin(0.5, 0.5);
     this.setImmovable(true);
+  }
 
-    // コインのアニメーションやエフェクトがあればここで追加
+  // プールから再利用される際に呼ばれる初期化メソッド
+  public initialize(config: CoinConfig = {}): void {
+    // デフォルト値とTiledからの設定をマージ
+    const finalConfig = { ...DEFAULT_COIN_CONFIG, ...config };
+    this.value = finalConfig.value;
+    this.spinSpeed = finalConfig.spinSpeed;
+
+    this.setActive(true);
+    this.setVisible(true);
+    if (this.body) {
+      this.body.enable = true;
+    }
   }
 }

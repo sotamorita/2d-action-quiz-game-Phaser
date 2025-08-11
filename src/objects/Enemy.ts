@@ -32,4 +32,19 @@ export default class Enemy extends BaseObject {
     this.health = finalConfig.health;
     this.damage = finalConfig.damage;
   }
+
+  // プールから再利用される際に呼ばれる初期化メソッド
+  public initialize(config: EnemyConfig = {}): void {
+    // デフォルト値とTiledからの設定をマージ
+    const finalConfig = { ...DEFAULT_ENEMY_CONFIG, ...config };
+    this.speed = finalConfig.speed;
+    this.health = finalConfig.health;
+    this.damage = finalConfig.damage;
+
+    this.setActive(true);
+    this.setVisible(true);
+    if (this.body) {
+      this.body.enable = true;
+    }
+  }
 }
