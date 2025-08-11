@@ -268,6 +268,13 @@ export default class GameScene extends Phaser.Scene {
       });
     });
 
+    // プレイヤーの状態変化をリッスン
+    this.player.on('state-changed', (newState: PlayerState) => {
+      if (newState === PlayerState.DEAD) {
+        this.cameras.main.stopFollow();
+      }
+    });
+
     // プレイヤーのアニメーションを生成
     if (!this.anims.exists('left')) {
       this.anims.create({ key: 'left', frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }), frameRate: 10, repeat: -1 });

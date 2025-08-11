@@ -88,7 +88,7 @@ export const UIConstants = {
   Background: {
     GroundY: 380,
     TileSpriteX: 0,
-    TileSpriteY: 80,
+    TileSpriteY: 0,
     TileSpriteWidth: 1600,
     TileSpriteHeight: 320,
   },

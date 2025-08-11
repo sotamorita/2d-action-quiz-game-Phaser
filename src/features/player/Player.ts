@@ -158,7 +158,9 @@ export default class Player extends BaseObject {
         this.setCollideWorldBounds(false); // 画面外に出られるように
         (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(true); // 重力は有効のまま
         (this.body as Phaser.Physics.Arcade.Body).checkCollision.down = false; // 地面との衝突を無効に
-        this.setVelocity(0, -300); // 少し飛び上がる演出
+        // 進行方向に応じて飛び上がる向きを変える
+        const directionX = this.lastDirection === 'left' ? -1 : 1;
+        this.setVelocity(100 * directionX, -300); // 斜め上に飛び上がる
         // 回転しながら消えるアニメーション
         this.scene.tweens.add({
           targets: this,
