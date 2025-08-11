@@ -96,8 +96,12 @@ export default class GameScene extends Phaser.Scene {
     this.load.image('castle', 'assets/castle.png');
     this.load.image('heart', 'assets/heart.png');
 
-    // Map JSON
-    this.load.json('map', 'assets/maps/level1.json');
+    // Map JSON (initで受け取ったパスを使用)
+    if (this.currentMapPath) {
+      this.load.json('map', this.currentMapPath);
+    } else {
+      console.error('GameScene: mapPath is not provided.');
+    }
   }
 
   create() {
@@ -150,7 +154,7 @@ export default class GameScene extends Phaser.Scene {
     // Load map objects
     const mapData = this.cache.json.get('map');
     if (!mapData) {
-      throw new Error('assets/maps/level1.json が読み込めていません（パス or JSON 構文を確認）');
+      throw new Error(`Map data from ${this.currentMapPath} could not be loaded. Check path or JSON syntax.`);
     }
     const objects = MapLoader.load(this, mapData, this.cursors);
 
