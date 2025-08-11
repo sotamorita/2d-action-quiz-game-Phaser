@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { UIConstants } from './UIConstants';
 
 export class CommonBackground {
   /**
@@ -7,13 +8,13 @@ export class CommonBackground {
    */
   static drawGameBackground(scene: Phaser.Scene): void {
     // 背景描画
-    const background = scene.add.tileSprite(0, 80, 1600, 320, 'background');
+    const bg = UIConstants.Background;
+    const background = scene.add.tileSprite(bg.TileSpriteX, bg.TileSpriteY, bg.TileSpriteWidth, bg.TileSpriteHeight, 'background');
     background.setOrigin(0, 0);
 
     // 地面描画（GameSceneと同じ配置）
-    const GROUND_Y = 380;
     for (let x = 200; x <= 1400; x += 400) {
-      scene.add.image(x, GROUND_Y, 'ground').setScale(2);
+      scene.add.image(x, bg.GroundY, 'ground').setScale(2);
     }
   }
 

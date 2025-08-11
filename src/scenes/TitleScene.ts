@@ -1,32 +1,10 @@
 import Phaser from 'phaser';
 import { RetroUI } from '../ui/RetroUI';
+import Menu from '../ui/components/Menu';
+import { UIConstants } from '../ui/UIConstants';
 
 export default class TitleScene extends Phaser.Scene {
-  private selectedIndex = 0;
-  private menuItems: Phaser.GameObjects.Text[] = [];
-  private menuOptions = ['ゲームスタート'];
-  private panel!: Phaser.GameObjects.Container;
-  private upKey?: Phaser.Input.Keyboard.Key;
-  private downKey?: Phaser.Input.Keyboard.Key;
-  private enterKey?: Phaser.Input.Keyboard.Key;
-
-  // キー入力ハンドラー（クリーンアップ用）
-  private onUpKey = () => {
-    this.selectedIndex = Math.max(0, this.selectedIndex - 1);
-    this.updateMenuHighlight();
-  };
-
-  private onDownKey = () => {
-    this.selectedIndex = Math.min(this.menuOptions.length - 1, this.selectedIndex + 1);
-    this.updateMenuHighlight();
-  };
-
-  private onEnterKey = () => {
-    if (this.selectedIndex === 0) {
-      // ゲームスタート
-      this.scene.start('StageSelectScene');
-    }
-  };
+  private menu!: Menu;
 
   constructor() {
     super('TitleScene');
@@ -40,79 +18,37 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   create() {
-    // 初期化：配列をクリア
-    this.menuItems = [];
-    this.selectedIndex = 0;
-
     // 背景画像を追加
-    this.add.image(320, 160, 'background');
+    this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'background');
 
-    // レトロ風UIパネル作成（アルファ値を0.7に変更）
-    const { overlay, panel } = RetroUI.createPanel(this, 320, 160, 400, 250, 0.7); // Y座標を160に調整、アルファ値を0.7に
-    this.panel = panel;
+    // レトロ風UIパネル作成
+    const { panel } = RetroUI.createPanel(this, this.cameras.main.width / 2, this.cameras.main.height / 2, 400, 250);
 
     // タイトルテキスト
-    RetroUI.createTitle(this, this.panel, 'レトロ・クイズ・アクション', -60, '28px'); // Y座標を-60に調整
+    RetroUI.createTitle(panel.scene, panel, 'レトロ・クイズ・アクション', -60);
 
-    // メニューアイテム作成
-    this.menuItems = RetroUI.createMenuItems(
-      this,
-      this.menuOptions,
-      this.panel,
-      0, // Y座標を0に調整
-      40,
-      '24px'
-    );
-
-    // メニュー項目にタップイベントを追加
-    this.menuItems.forEach((item, index) => {
-      item.setInteractive({ useHandCursor: true });
-      item.on('pointerdown', () => {
-        this.selectedIndex = index;
-        this.updateMenuHighlight();
-        this.onEnterKey(); // タップで即時決定
-      });
+    // メニュー作成
+    this.menu = new Menu(this, {
+      x: panel.x,
+      y: panel.y,
+      options: ['ゲームスタート'],
+      fontSize: UIConstants.FontSize.Large,
+      startY: 0,
     });
 
-    // キー入力設定
-    this.upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    this.downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-    this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-
-    this.upKey.on('down', this.onUpKey, this);
-    this.downKey.on('down', this.onDownKey, this);
-    this.enterKey.on('down', this.onEnterKey, this);
-
-    // 初期ハイライト設定
-    this.updateMenuHighlight();
+    // メニュー選択時のイベントリスナー
+    this.menu.on('selected', (index: number) => {
+      if (index === 0) {
+        this.scene.start('StageSelectScene');
+      }
+    });
 
     // 操作説明
     RetroUI.createInstructionText(
-      this,
-      this.panel,
+      panel.scene,
+      panel,
       '↑/↓: 選択  Enter: 決定',
-      40, // Y座標を40に調整
-      '14px'
+      40
     );
-
-    // クリーンアップ設定
-    this.events.once('shutdown', this.cleanup, this);
-    this.events.once('destroy', this.cleanup, this);
-  }
-
-  private updateMenuHighlight() {
-    RetroUI.updateSelection(this.menuItems, this.selectedIndex, this.menuOptions);
-  }
-
-  private cleanup() {
-    // キー入力ハンドラーの解除
-    this.upKey?.off('down', this.onUpKey, this);
-    this.downKey?.off('down', this.onDownKey, this);
-    this.enterKey?.off('down', this.onEnterKey, this);
-
-    // メニュー項目のイベントリスナーをクリーンアップ
-    this.menuItems.forEach(item => {
-      item.off('pointerdown');
-    });
   }
 }

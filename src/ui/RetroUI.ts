@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { UIConstants } from './UIConstants';
 
 export class RetroUI {
   /**
@@ -9,96 +10,29 @@ export class RetroUI {
     x: number,
     y: number,
     width: number,
-    height: number,
-    overlayAlpha: number = 0.6
+    height: number
   ): { overlay: Phaser.GameObjects.Rectangle; panel: Phaser.GameObjects.Container } {
     // 半透明黒のオーバーレイ
-    const overlay = scene.add.rectangle(320, 200, 640, 400, 0x000000, overlayAlpha);
+    const overlay = scene.add.rectangle(
+      scene.cameras.main.width / 2,
+      scene.cameras.main.height / 2,
+      scene.cameras.main.width,
+      scene.cameras.main.height,
+      UIConstants.Overlay.BgColor,
+      UIConstants.Overlay.BgAlpha
+    );
     overlay.setScrollFactor(0);
 
     // 中央パネル（太枠・直角）
     const panel = scene.add.container(x, y);
-
-    const panelBg = scene.add.rectangle(0, 0, width, height, 0x000000, 0.8);
-    const panelBorder = scene.add.rectangle(0, 0, width, height, 0xffffff, 0);
-    panelBorder.setStrokeStyle(4, 0xffffff);
+    const panelBg = scene.add.rectangle(0, 0, width, height, UIConstants.Panel.BgColor, UIConstants.Panel.BgAlpha);
+    const panelBorder = scene.add.rectangle(0, 0, width, height, UIConstants.Panel.BorderColor, 0);
+    panelBorder.setStrokeStyle(UIConstants.Panel.BorderWidth, UIConstants.Panel.BorderColor);
 
     panel.add([panelBg, panelBorder]);
     panel.setScrollFactor(0);
 
     return { overlay, panel };
-  }
-
-  /**
-   * メニューアイテムを作成
-   */
-  static createMenuItems(
-    scene: Phaser.Scene,
-    options: string[],
-    container: Phaser.GameObjects.Container,
-    startY: number = -50,
-    spacing: number = 40,
-    fontSize: string = '20px',
-    wordWrapWidth?: number
-  ): Phaser.GameObjects.Text[] {
-    const menuItems: Phaser.GameObjects.Text[] = [];
-
-    options.forEach((option, index) => {
-      const style: Phaser.Types.GameObjects.Text.TextStyle = {
-        fontSize: fontSize,
-        fontFamily: 'DotGothic16, sans-serif',
-        color: '#ffffff',
-        backgroundColor: 'rgba(0,0,0,0)',
-        padding: { x: 10, y: 5 }
-      };
-
-      if (wordWrapWidth) {
-        style.wordWrap = { width: wordWrapWidth, useAdvancedWrap: true };
-      }
-
-      const menuText = scene.add.text(0, startY + (index * spacing), option, style).setOrigin(0.5);
-
-      menuItems.push(menuText);
-      container.add(menuText);
-    });
-
-    return menuItems;
-  }
-
-  /**
-   * 選択状態を更新（黄色背景+黒文字+「▶」）
-   */
-  static updateSelection(
-    items: Phaser.GameObjects.Text[],
-    selectedIndex: number,
-    options: string[]
-  ): void {
-    items.forEach((item, index) => {
-      if (!item || !item.active) return;
-
-      // 現在のスタイルを保持
-      const currentStyle = item.style;
-
-      if (index === selectedIndex) {
-        // 選択中：黄色背景＋黒文字＋先頭に「▶」
-        item.setText(`▶ ${options[index]}`);
-        item.setStyle({
-          ...currentStyle, // 既存のスタイルをコピー
-          backgroundColor: '#ffff00',
-          color: '#000000',
-          padding: { x: 10, y: 5 }
-        });
-      } else {
-        // 非選択：透明背景＋白文字
-        item.setText(options[index]);
-        item.setStyle({
-          ...currentStyle, // 既存のスタイルをコピー
-          backgroundColor: 'rgba(0,0,0,0)',
-          color: '#ffffff',
-          padding: { x: 10, y: 5 }
-        });
-      }
-    });
   }
 
   /**
@@ -108,14 +42,12 @@ export class RetroUI {
     scene: Phaser.Scene,
     container: Phaser.GameObjects.Container,
     text: string,
-    y: number = -100,
-    fontSize: string = '32px',
-    color: string = '#ffffff'
+    y: number = -100
   ): Phaser.GameObjects.Text {
     const titleText = scene.add.text(0, y, text, {
-      fontSize: fontSize,
-      fontFamily: 'DotGothic16, sans-serif',
-      color: color
+      fontSize: UIConstants.FontSize.Title,
+      fontFamily: UIConstants.FontFamily,
+      color: UIConstants.Color.White
     }).setOrigin(0.5);
 
     container.add(titleText);
@@ -130,14 +62,12 @@ export class RetroUI {
     container: Phaser.GameObjects.Container,
     text: string,
     y: number = 100,
-    fontSize: string = '14px',
-    color: string = '#cccccc',
     wordWrapWidth?: number
   ): Phaser.GameObjects.Text {
     const style: Phaser.Types.GameObjects.Text.TextStyle = {
-      fontSize: fontSize,
-      fontFamily: 'DotGothic16, sans-serif',
-      color: color,
+      fontSize: UIConstants.FontSize.Small,
+      fontFamily: UIConstants.FontFamily,
+      color: UIConstants.Color.Grey,
       align: 'center'
     };
 
@@ -146,7 +76,6 @@ export class RetroUI {
     }
 
     const instructionText = scene.add.text(0, y, text, style).setOrigin(0.5);
-
     container.add(instructionText);
     return instructionText;
   }
@@ -162,11 +91,10 @@ export class RetroUI {
     style?: Phaser.Types.GameObjects.Text.TextStyle
   ): Phaser.GameObjects.Text {
     const defaultStyle: Phaser.Types.GameObjects.Text.TextStyle = {
-      fontFamily: 'DotGothic16, sans-serif',
-      color: '#ffffff', // デフォルトの色
-      fontSize: '16px', // デフォルトのフォントサイズ
-      wordWrap: { width: 484 }, // useAdvancedWrapをデフォルトから削除
-      lineSpacing: 5 // 行間を確保
+      fontFamily: UIConstants.FontFamily,
+      color: UIConstants.Color.White,
+      fontSize: UIConstants.FontSize.Normal,
+      lineSpacing: 5
     };
     const mergedStyle = { ...defaultStyle, ...style };
     return scene.add.text(x, y, text, mergedStyle);
