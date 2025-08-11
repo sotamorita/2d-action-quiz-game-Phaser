@@ -1,16 +1,31 @@
 import Phaser from 'phaser';
 
+// Tiledから渡されるプロパティの型定義
+export interface CoinConfig {
+  value?: number;
+  spinSpeed?: number;
+}
+
+// デフォルト値
+const DEFAULT_COIN_CONFIG: Required<CoinConfig> = {
+  value: 1,
+  spinSpeed: 1,
+};
+
 export default class Coin extends Phaser.Physics.Arcade.Sprite {
   value: number;
   spinSpeed: number;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, properties: Record<string, any> = {}) {
+  constructor(scene: Phaser.Scene, x: number, y: number, config: CoinConfig = {}) {
     super(scene, x, y, 'coin');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    this.value = properties.value ?? 1;
-    this.spinSpeed = properties.spinSpeed ?? 1;
+    // デフォルト値とTiledからの設定をマージ
+    const finalConfig = { ...DEFAULT_COIN_CONFIG, ...config };
+
+    this.value = finalConfig.value;
+    this.spinSpeed = finalConfig.spinSpeed;
 
     this.setOrigin(0.5, 0.5);
     this.setImmovable(true);

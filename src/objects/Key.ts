@@ -1,16 +1,31 @@
 import Phaser from 'phaser';
 
+// Tiledから渡されるプロパティの型定義
+export interface KeyConfig {
+  keyId?: string;
+  color?: string;
+}
+
+// デフォルト値
+const DEFAULT_KEY_CONFIG: Required<KeyConfig> = {
+  keyId: 'default_key',
+  color: 'gold',
+};
+
 export default class Key extends Phaser.Physics.Arcade.Sprite {
   keyId: string;
   color: string;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, properties: Record<string, any> = {}) {
+  constructor(scene: Phaser.Scene, x: number, y: number, config: KeyConfig = {}) {
     super(scene, x, y, 'key');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    this.keyId = properties.keyId ?? '';
-    this.color = properties.color ?? 'gold';
+    // デフォルト値とTiledからの設定をマージ
+    const finalConfig = { ...DEFAULT_KEY_CONFIG, ...config };
+
+    this.keyId = finalConfig.keyId;
+    this.color = finalConfig.color;
 
     this.setOrigin(0.5, 0.5);
     this.setImmovable(true);
