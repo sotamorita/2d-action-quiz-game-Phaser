@@ -6,6 +6,11 @@ export default class StageSelectScene extends Phaser.Scene {
   private menuItems: Phaser.GameObjects.Text[] = [];
   private stages = [{ id: 'level1', name: 'レベル１', mapPath: 'assets/maps/level1.json' }];
   private panel!: Phaser.GameObjects.Container;
+  private upKey?: Phaser.Input.Keyboard.Key;
+  private downKey?: Phaser.Input.Keyboard.Key;
+  private enterKey?: Phaser.Input.Keyboard.Key;
+  private escKey?: Phaser.Input.Keyboard.Key;
+  private oneKey?: Phaser.Input.Keyboard.Key;
 
   // キー入力ハンドラー（クリーンアップ用）
   private onUpKey = () => {
@@ -133,17 +138,17 @@ export default class StageSelectScene extends Phaser.Scene {
     );
 
     // キー入力設定
-    const upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    const downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-    const enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-    const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-    const oneKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+    this.upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+    this.downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+    this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    this.escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    this.oneKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 
-    upKey.on('down', this.onUpKey, this);
-    downKey.on('down', this.onDownKey, this);
-    enterKey.on('down', this.onEnterKey, this);
-    escKey.on('down', this.onEscKey, this);
-    oneKey.on('down', this.on1Key, this);
+    this.upKey.on('down', this.onUpKey, this);
+    this.downKey.on('down', this.onDownKey, this);
+    this.enterKey.on('down', this.onEnterKey, this);
+    this.escKey.on('down', this.onEscKey, this);
+    this.oneKey.on('down', this.on1Key, this);
 
     // 初期ハイライト設定（メニュー作成後に実行）
     this.updateMenuHighlight();
@@ -159,16 +164,15 @@ export default class StageSelectScene extends Phaser.Scene {
 
   private cleanup() {
     // キー入力ハンドラーの解除
-    const upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    const downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-    const enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-    const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-    const oneKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+    this.upKey?.off('down', this.onUpKey, this);
+    this.downKey?.off('down', this.onDownKey, this);
+    this.enterKey?.off('down', this.onEnterKey, this);
+    this.escKey?.off('down', this.onEscKey, this);
+    this.oneKey?.off('down', this.on1Key, this);
 
-    upKey.off('down', this.onUpKey, this);
-    downKey.off('down', this.onDownKey, this);
-    enterKey.off('down', this.onEnterKey, this);
-    escKey.off('down', this.onEscKey, this);
-    oneKey.off('down', this.on1Key, this);
+    // メニュー項目のイベントリスナーをクリーンアップ
+    this.menuItems.forEach(item => {
+      item.off('pointerdown');
+    });
   }
 }

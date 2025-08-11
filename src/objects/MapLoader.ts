@@ -1,72 +1,135 @@
 import Phaser from 'phaser';
-import Player from './Player';
-import Enemy from './Enemy';
-import Coin from './Coin';
-import Key from './Key';
-import Castle from './Castle';
-import Heart from './Heart';
 
-type GameObjectsResult = {
-  player: Player | null;
-  enemies: Enemy[];
-  coins: Coin[];
-  hearts: Heart[];
-  keys: Key[];
-  castles: Castle[];
+// --- Type Definitions for Tiled JSON Data ---
+
+interface TiledObject {
+  id: number;
+  name: string;
+  type: string;
+  x: number;
+  y: number;
+  properties: Record<string, any>;
+}
+
+interface TiledLayer {
+  type: 'objectgroup';
+  name: string;
+  objects: TiledObject[];
+}
+
+interface TiledMap {
+  width: number;
+  height: number;
+  layers: TiledLayer[];
+}
+
+// --- Configuration Types for Game Objects ---
+
+export type PlayerConfig = {
+  x: number;
+  y: number;
+  properties: Record<string, any>;
 };
 
+export type EnemyConfig = {
+  x: number;
+  y: number;
+  properties: Record<string, any>;
+};
+
+export type CoinConfig = {
+  x: number;
+  y: number;
+  properties: Record<string, any>;
+};
+
+export type KeyConfig = {
+  x: number;
+  y: number;
+  properties: Record<string, any>;
+};
+
+export type HeartConfig = {
+  x: number;
+  y: number;
+  properties: Record<string, any>;
+};
+
+export type CastleConfig = {
+  x: number;
+  y: number;
+  properties: Record<string, any>;
+};
+
+// --- Result Type from the Loader ---
+
+export type MapObjects = {
+  player: PlayerConfig | null;
+  enemies: EnemyConfig[];
+  coins: CoinConfig[];
+  hearts: HeartConfig[];
+  keys: KeyConfig[];
+  castles: CastleConfig[];
+};
+
+/**
+ * A utility class for parsing Tiled map data.
+ * It extracts object information and returns structured configuration objects,
+ * but does not create any Phaser GameObjects itself.
+ */
 export default class MapLoader {
-  static load(scene: Phaser.Scene, tiledData: any, cursors: Phaser.Types.Input.Keyboard.CursorKeys): GameObjectsResult {
-    const result: GameObjectsResult = {
+  /**
+   * Parses the Tiled map data and returns configurations for all game objects.
+   * @param tiledData The raw Tiled JSON data.
+   * @returns A MapObjects object containing arrays of configurations.
+   */
+  static load(tiledData: TiledMap): MapObjects {
+    const result: MapObjects = {
       player: null,
       enemies: [],
       coins: [],
       hearts: [],
       keys: [],
-      castles: []
+      castles: [],
     };
 
-    if (!tiledData.layers) return result;
-
-    tiledData.layers.forEach((layer: any) => {
-      if (layer.type === 'objectgroup') {
-        layer.objects.forEach((obj: any) => {
-          const props = MapLoader.parseProperties(obj.properties);
-
-          switch (obj.type) {
-            case 'player':
-              result.player = new Player(scene, obj.x, obj.y, cursors, props);
-              break;
-            case 'enemy':
-              result.enemies.push(new Enemy(scene, obj.x, obj.y, props));
-              break;
-            case 'coin':
-              result.coins.push(new Coin(scene, obj.x, obj.y, props));
-              break;
-            case 'key':
-              result.keys.push(new Key(scene, obj.x, obj.y, props));
-              break;
-            case 'heart':
-              result.hearts.push(new Heart(scene, obj.x, obj.y, props));
-              break;
-            case 'castle':
-              result.castles.push(new Castle(scene, obj.x, obj.y, props));
-              break;
-          }
-        });
-      }
-    });
-
-    return result;
-  }
-
-  private static parseProperties(properties: any[] = []): Record<string, any> {
-    const result: Record<string, any> = {};
-    if (Array.isArray(properties)) {
-      properties.forEach(prop => {
-        result[prop.name] = prop.value;
-      });
+    // Find the 'game_objects' layer
+    const objectLayer = tiledData.layers.find(layer => layer.name === 'game_objects');
+    if (!objectLayer || !objectLayer.objects) {
+      console.warn('MapLoader: "game_objects" layer not found or is empty.');
+      return result;
     }
+
+    // Process each object in the layer
+    for (const obj of objectLayer.objects) {
+      // Ensure properties exist, defaulting to an empty object if not.
+      const properties = obj.properties ?? {};
+
+      switch (obj.type) {
+        case 'player':
+          result.player = { x: obj.x, y: obj.y, properties };
+          break;
+        case 'enemy':
+          result.enemies.push({ x: obj.x, y: obj.y, properties });
+          break;
+        case 'coin':
+          result.coins.push({ x: obj.x, y: obj.y, properties });
+          break;
+        case 'key':
+          result.keys.push({ x: obj.x, y: obj.y, properties });
+          break;
+        case 'heart':
+          result.hearts.push({ x: obj.x, y: obj.y, properties });
+          break;
+        case 'castle':
+          result.castles.push({ x: obj.x, y: obj.y, properties });
+          break;
+        default:
+          console.warn(`MapLoader: Unknown object type "${obj.type}" found.`);
+          break;
+      }
+    }
+
     return result;
   }
 }

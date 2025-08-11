@@ -12,11 +12,11 @@
           "type": "player",
           "x": 100,
           "y": 250,
-          "properties": [
-            { "name": "speed", "type": "int", "value": 200 },
-            { "name": "jumpForce", "type": "int", "value": 360 },
-            { "name": "maxHealth", "type": "int", "value": 5 }
-          ]
+          "properties": {
+            "speed": 200,
+            "jumpForce": 360,
+            "maxHealth": 1
+          }
         },
         {
           "id": 2,
@@ -24,11 +24,11 @@
           "type": "enemy",
           "x": 600,
           "y": 190,
-          "properties": [
-            { "name": "speed", "type": "int", "value": 100 },
-            { "name": "health", "type": "int", "value": 3 },
-            { "name": "damage", "type": "int", "value": 1 }
-          ]
+          "properties": {
+            "speed": 100,
+            "health": 3,
+            "damage": 1
+          }
         },
         {
           "id": 3,
@@ -36,10 +36,10 @@
           "type": "coin",
           "x": 300,
           "y": 190,
-          "properties": [
-            { "name": "value", "type": "int", "value": 10 },
-            { "name": "spinSpeed", "type": "int", "value": 2 }
-          ]
+          "properties": {
+            "value": 10,
+            "spinSpeed": 2
+          }
         },
         {
           "id": 4,
@@ -47,10 +47,10 @@
           "type": "key",
           "x": 800,
           "y": 190,
-          "properties": [
-            { "name": "keyId", "type": "string", "value": "door1" },
-            { "name": "color", "type": "string", "value": "gold" }
-          ]
+          "properties": {
+            "keyId": "door1",
+            "color": "gold"
+          }
         },
         {
           "id": 5,
@@ -58,10 +58,10 @@
           "type": "castle",
           "x": 1550,
           "y": 278,
-          "properties": [
-            { "name": "level", "type": "int", "value": 1 },
-            { "name": "requiredKeys", "type": "int", "value": 3 }
-          ]
+          "properties": {
+            "level": 1,
+            "requiredKeys": 3
+          }
         },
         {
           "id": 6,
@@ -69,9 +69,9 @@
           "type": "heart",
           "x": 500,
           "y": 190,
-          "properties": [
-            { "name": "healAmount", "type": "int", "value": 1 }
-          ]
+          "properties": {
+            "healAmount": 1
+          }
         }
       ]
     }

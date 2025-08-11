@@ -7,12 +7,12 @@ import Castle from '../objects/Castle';
 import MapLoader from '../objects/MapLoader';
 import Heart from '../objects/Heart';
 import { RetroUI } from '../ui/RetroUI';
-import VirtualControls from '../ui/VirtualControls'; // VirtualControlsをインポート
+
+const INVINCIBILITY_DURATION = 3000; // 3秒の無敵時間
 
 export default class GameScene extends Phaser.Scene {
   player!: Player;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  virtualControls?: VirtualControls; // VirtualControlsのインスタンス
 
   platforms!: Phaser.Physics.Arcade.StaticGroup;
 
@@ -40,12 +40,16 @@ export default class GameScene extends Phaser.Scene {
   keyCollider?: Phaser.Physics.Arcade.Collider;
   castleCollider?: Phaser.Physics.Arcade.Collider;
 
+  // Key handlers
+  private escKey?: Phaser.Input.Keyboard.Key;
+
   // Enemy ref during quiz
   currentEnemy?: Enemy;
 
   // Scene event handlers (for cleanup)
   private onScenePause = () => {
-    this.input.keyboard!.enabled = false;
+    // グローバルなキーボード入力を無効化すると、他のシーンに影響が出るため削除
+    // this.input.keyboard!.enabled = false;
   };
   private onSceneResume = () => {
     this.input.keyboard!.enabled = true;
@@ -118,18 +122,9 @@ export default class GameScene extends Phaser.Scene {
     // Keyboard
     this.cursors = this.input.keyboard!.createCursorKeys();
 
-    // モバイルデバイス検出
-    const isMobile = this.sys.game.device.os.android || this.sys.game.device.os.iOS;
-
-    if (isMobile) {
-      this.virtualControls = new VirtualControls(this);
-      this.virtualControls.setVisible(true); // モバイルの場合のみ表示
-      this.events.on('virtual-pause-button-down', this.onEscKey, this); // バーチャルポーズボタンのイベントを購読
-    } else {
-      // デスクトップの場合、Escキー設定（PauseOverlayScene呼び出し用）
-      const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-      escKey.on('down', this.onEscKey, this);
-    }
+    // デスクトップの場合、Escキー設定（PauseOverlayScene呼び出し用）
+    this.escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    this.escKey.on('down', this.onEscKey, this);
 
     // Background image (tiled to cover the game area)
     const background = this.add.tileSprite(0, 0, 1600, 320, 'background'); // 背景画像の高さを320に調整
@@ -156,13 +151,38 @@ export default class GameScene extends Phaser.Scene {
     if (!mapData) {
       throw new Error(`Map data from ${this.currentMapPath} could not be loaded. Check path or JSON syntax.`);
     }
-    const objects = MapLoader.load(this, mapData, this.cursors);
+    const mapObjects = MapLoader.load(mapData);
+
+    // Groups
+    this.enemies = this.physics.add.group();
+    this.coins = this.physics.add.group();
+    this.hearts = this.physics.add.group();
+
+    // Create objects from configs
+    mapObjects.enemies.forEach(e => this.enemies.add(new Enemy(this, e.x, e.y, e.properties)));
+    mapObjects.coins.forEach(c => this.coins.add(new Coin(this, c.x, c.y, c.properties)));
+    mapObjects.hearts.forEach(h => this.hearts.add(new Heart(this, h.x, h.y, h.properties)));
+
+    if (mapObjects.keys.length > 0) {
+      const keyConfig = mapObjects.keys[0];
+      this.key = new Key(this, keyConfig.x, keyConfig.y, keyConfig.properties);
+    }
+    if (mapObjects.castles.length > 0) {
+      const castleConfig = mapObjects.castles[0];
+      this.castle = new Castle(this, castleConfig.x, castleConfig.y, castleConfig.properties);
+    }
 
     // Player
-    if (!objects.player) {
+    if (!mapObjects.player) {
       throw new Error('マップデータにプレイヤーが定義されていません');
     }
-    this.player = objects.player;
+    this.player = new Player(
+      this,
+      mapObjects.player.x,
+      mapObjects.player.y,
+      this.cursors,
+      mapObjects.player.properties
+    );
     this.player.setDepth(10);
     this.physics.add.collider(this.player, this.platforms);
 
@@ -214,25 +234,12 @@ export default class GameScene extends Phaser.Scene {
       fontSize: '12px' // フォントサイズを12pxに拡大
     }).setScrollFactor(0);
 
-    // Groups
-    this.enemies = this.physics.add.group();
-    objects.enemies.forEach(e => this.enemies.add(e));
-
-    this.coins = this.physics.add.group(objects.coins);
-    this.hearts = this.physics.add.group(objects.hearts);
-
-    if (objects.keys && objects.keys.length > 0) {
-      this.key = objects.keys[0];
-    }
-    if (objects.castles && objects.castles.length > 0) {
-      this.castle = objects.castles[0];
-    }
-
+    // Overlaps & collisions
     // Overlaps & collisions
     this.enemyCollider = this.physics.add.overlap(
       this.player,
       this.enemies,
-      this.handleEnemyCollision as any,
+      this.handleEnemyCollision,
       undefined,
       this
     );
@@ -240,10 +247,9 @@ export default class GameScene extends Phaser.Scene {
     this.coinCollider = this.physics.add.overlap(
       this.player,
       this.coins,
-      (playerObj: any, coinObj: any) => {
-        const coin = coinObj as Coin;
-        coin.destroy();
-        this.score += coin.value ?? 1;
+      (player, coin) => {
+        (coin as Coin).destroy();
+        this.score += (coin as Coin).value ?? 1;
         this.scoreText.setText(`Score: ${this.score}`);
       },
       undefined,
@@ -253,10 +259,9 @@ export default class GameScene extends Phaser.Scene {
     this.heartCollider = this.physics.add.overlap(
       this.player,
       this.hearts,
-      (playerObj: any, heartObj: any) => {
-        const heart = heartObj as Heart;
-        heart.destroy();
-        this.player.heal(heart.healAmount ?? 1);
+      (player, heart) => {
+        (heart as Heart).destroy();
+        this.player.heal((heart as Heart).healAmount ?? 1);
         this.hpText.setText(`HP: ${this.player.health}`);
       },
       undefined,
@@ -267,7 +272,7 @@ export default class GameScene extends Phaser.Scene {
       this.keyCollider = this.physics.add.overlap(
         this.player,
         this.key,
-        this.handleKeyCollision as any,
+        this.handleKeyCollision,
         undefined,
         this
       );
@@ -277,7 +282,7 @@ export default class GameScene extends Phaser.Scene {
       this.castleCollider = this.physics.add.overlap(
         this.player,
         this.castle,
-        this.handleCastleCollision as any,
+        this.handleCastleCollision,
         undefined,
         this
       );
@@ -289,24 +294,28 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update() {
-    // キーボード入力とバーチャルコントロール入力を統合
-    const leftIsDown = this.cursors.left?.isDown || this.virtualControls?.left.isDown || false;
-    const rightIsDown = this.cursors.right?.isDown || this.virtualControls?.right.isDown || false;
-    const jumpIsDown = (this.cursors.up?.isDown || this.cursors.space?.isDown) || this.virtualControls?.jump.isDown || false;
+    // キーボード入力
+    const leftIsDown = this.cursors.left?.isDown ?? false;
+    const rightIsDown = this.cursors.right?.isDown ?? false;
+    const jumpIsDown = (this.cursors.up?.isDown || this.cursors.space?.isDown) ?? false;
 
     // Playerのupdateメソッドに統合された入力状態を渡す
     this.player.update(leftIsDown, rightIsDown, jumpIsDown);
     this.hpText.setText(`HP: ${this.player.health}`);
   }
 
-  private handleEnemyCollision = (_player: any, enemy: any) => {
+  private handleEnemyCollision: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (playerObj, enemyObj) => {
+    const enemy = enemyObj as Enemy;
+
     if (this.player.isInvincible) return;
     if (!enemy.active) return;
 
-    this.currentEnemy = enemy as Enemy;
+    this.currentEnemy = enemy;
 
     if (this.player.body) this.player.body.enable = false;
-    if (enemy.body) enemy.body.enable = false;
+    if (enemy.body) {
+      enemy.body.enable = false;
+    }
 
     // Disable input to avoid double launch
     this.input.keyboard!.enabled = false;
@@ -325,7 +334,7 @@ export default class GameScene extends Phaser.Scene {
       }
     } else {
       this.player.damage(1);
-      this.player.startInvincibility(3000);
+      this.player.startInvincibility(INVINCIBILITY_DURATION);
 
       if (this.player.health <= 0) {
         this.scene.stop();
@@ -345,19 +354,19 @@ export default class GameScene extends Phaser.Scene {
     if (this.player.body) this.player.body.enable = true;
 
     // Re-enable input (QuizScene closed by itself)
-    this.input.keyboard!.enabled = true;
+    // this.input.keyboard!.enabled = true; // onSceneResumeで処理されるため不要
 
     this.scene.resume();
     this.currentEnemy = undefined;
   };
 
-  private handleKeyCollision = (_player: any, key: any) => {
+  private handleKeyCollision: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (playerObj, keyObj) => {
     this.hasKey = true;
-    key.destroy();
+    (keyObj as Key).destroy();
     // hintなどあればここで
   };
 
-  private handleCastleCollision = (_player: any, _castle: any) => {
+  private handleCastleCollision: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (playerObj, castleObj) => {
     if (this.hasKey) {
       this.scene.start('ClearScene', {
         stageId: this.currentStageId,
@@ -377,15 +386,7 @@ export default class GameScene extends Phaser.Scene {
     this.events.off('resume', this.onSceneResume, this);
 
     // Off key events
-    // モバイルとデスクトップで異なるクリーンアップ
-    const isMobile = this.sys.game.device.os.android || this.sys.game.device.os.iOS;
-    if (isMobile) {
-      this.events.off('virtual-pause-button-down', this.onEscKey, this);
-      this.virtualControls?.destroy(); // バーチャルコントロールを破棄
-    } else {
-      const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-      escKey.off('down', this.onEscKey, this);
-    }
+    this.escKey?.off('down', this.onEscKey, this);
 
     // Destroy colliders
     this.enemyCollider?.destroy();

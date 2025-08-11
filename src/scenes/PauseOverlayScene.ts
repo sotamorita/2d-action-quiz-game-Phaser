@@ -9,6 +9,12 @@ export default class PauseOverlayScene extends Phaser.Scene {
   private menuItems: Phaser.GameObjects.Text[] = [];
   private menuOptions = ['コンティニュー', 'リトライ', 'タイトルへ戻る'];
   private panel!: Phaser.GameObjects.Container;
+  private upKey?: Phaser.Input.Keyboard.Key;
+  private downKey?: Phaser.Input.Keyboard.Key;
+  private enterKey?: Phaser.Input.Keyboard.Key;
+  private escKey?: Phaser.Input.Keyboard.Key;
+  private rKey?: Phaser.Input.Keyboard.Key;
+  private tKey?: Phaser.Input.Keyboard.Key;
 
   // キー入力ハンドラー（クリーンアップ用）
   private onUpKey = () => {
@@ -71,19 +77,19 @@ export default class PauseOverlayScene extends Phaser.Scene {
     );
 
     // キー入力設定
-    const upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    const downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-    const enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-    const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-    const rKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-    const tKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.T);
+    this.upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+    this.downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+    this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    this.escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    this.rKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+    this.tKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.T);
 
-    upKey.on('down', this.onUpKey, this);
-    downKey.on('down', this.onDownKey, this);
-    enterKey.on('down', this.onEnterKey, this);
-    escKey.on('down', this.onEscKey, this);
-    rKey.on('down', this.onRKey, this);
-    tKey.on('down', this.onTKey, this);
+    this.upKey.on('down', this.onUpKey, this);
+    this.downKey.on('down', this.onDownKey, this);
+    this.enterKey.on('down', this.onEnterKey, this);
+    this.escKey.on('down', this.onEscKey, this);
+    this.rKey.on('down', this.onRKey, this);
+    this.tKey.on('down', this.onTKey, this);
 
     // 初期ハイライト設定
     this.updateMenuHighlight();
@@ -120,41 +126,32 @@ export default class PauseOverlayScene extends Phaser.Scene {
   private executeAction(actionIndex: number) {
     switch (actionIndex) {
       case 0: // コンティニュー
-        this.scene.resume('GameScene');
+        this.scene.resume(this.returnScene || 'GameScene');
         this.scene.stop();
         break;
       case 1: // リトライ
-        this.scene.resume('GameScene');
-        this.scene.stop('GameScene');
-        this.scene.stop();
+        this.scene.stop(this.returnScene || 'GameScene');
         this.scene.start('GameScene', {
           stageId: this.stageId,
           mapPath: this.mapPath
         });
+        this.scene.stop(); // ポーズシーン自身を停止
         break;
       case 2: // タイトルへ戻る
-        this.scene.resume('GameScene');
-        this.scene.stop('GameScene');
-        this.scene.stop();
+        this.scene.stop(this.returnScene || 'GameScene');
         this.scene.start('TitleScene');
+        this.scene.stop(); // ポーズシーン自身を停止
         break;
     }
   }
 
   private cleanup() {
     // キー入力ハンドラーの解除
-    const upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    const downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-    const enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-    const escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-    const rKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-    const tKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.T);
-
-    upKey.off('down', this.onUpKey, this);
-    downKey.off('down', this.onDownKey, this);
-    enterKey.off('down', this.onEnterKey, this);
-    escKey.off('down', this.onEscKey, this);
-    rKey.off('down', this.onRKey, this);
-    tKey.off('down', this.onTKey, this);
+    this.upKey?.off('down', this.onUpKey, this);
+    this.downKey?.off('down', this.onDownKey, this);
+    this.enterKey?.off('down', this.onEnterKey, this);
+    this.escKey?.off('down', this.onEscKey, this);
+    this.rKey?.off('down', this.onRKey, this);
+    this.tKey?.off('down', this.onTKey, this);
   }
 }

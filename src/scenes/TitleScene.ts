@@ -6,6 +6,9 @@ export default class TitleScene extends Phaser.Scene {
   private menuItems: Phaser.GameObjects.Text[] = [];
   private menuOptions = ['ゲームスタート'];
   private panel!: Phaser.GameObjects.Container;
+  private upKey?: Phaser.Input.Keyboard.Key;
+  private downKey?: Phaser.Input.Keyboard.Key;
+  private enterKey?: Phaser.Input.Keyboard.Key;
 
   // キー入力ハンドラー（クリーンアップ用）
   private onUpKey = () => {
@@ -72,13 +75,13 @@ export default class TitleScene extends Phaser.Scene {
     });
 
     // キー入力設定
-    const upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    const downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-    const enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    this.upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+    this.downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+    this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
-    upKey.on('down', this.onUpKey, this);
-    downKey.on('down', this.onDownKey, this);
-    enterKey.on('down', this.onEnterKey, this);
+    this.upKey.on('down', this.onUpKey, this);
+    this.downKey.on('down', this.onDownKey, this);
+    this.enterKey.on('down', this.onEnterKey, this);
 
     // 初期ハイライト設定
     this.updateMenuHighlight();
@@ -103,12 +106,13 @@ export default class TitleScene extends Phaser.Scene {
 
   private cleanup() {
     // キー入力ハンドラーの解除
-    const upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    const downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-    const enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    this.upKey?.off('down', this.onUpKey, this);
+    this.downKey?.off('down', this.onDownKey, this);
+    this.enterKey?.off('down', this.onEnterKey, this);
 
-    upKey.off('down', this.onUpKey, this);
-    downKey.off('down', this.onDownKey, this);
-    enterKey.off('down', this.onEnterKey, this);
+    // メニュー項目のイベントリスナーをクリーンアップ
+    this.menuItems.forEach(item => {
+      item.off('pointerdown');
+    });
   }
 }

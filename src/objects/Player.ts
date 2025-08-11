@@ -92,4 +92,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   damage(amount: number) {
     this.health = Math.max(this.health - amount, 0);
   }
+
+  destroy(fromScene?: boolean) {
+    // 無敵状態のタイマーとTweenをクリーンアップ
+    if (this.invincibleTimer) {
+      this.invincibleTimer.destroy();
+      this.invincibleTimer = undefined;
+    }
+    if (this.scene) {
+      this.scene.tweens.killTweensOf(this);
+    }
+
+    super.destroy(fromScene);
+  }
 }
