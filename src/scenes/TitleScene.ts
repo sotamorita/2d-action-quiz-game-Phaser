@@ -9,14 +9,9 @@ export default class TitleScene extends Phaser.Scene {
     super('TitleScene');
   }
 
-  preload() {
-    // 背景画像を読み込み
-    if (!this.textures.exists('background')) {
-      this.load.image('background', 'assets/maps/background.png');
-    }
-  }
-
   create() {
+    this.cameras.main.fadeIn(500, 0, 0, 0);
+
     const centerX = this.cameras.main.width / 2;
     const centerY = this.cameras.main.height / 2;
 

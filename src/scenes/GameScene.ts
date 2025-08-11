@@ -85,27 +85,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    // Player spritesheet
-    this.load.spritesheet('player', 'assets/player/player.png', {
-      frameWidth: 32,
-      frameHeight: 48
-    });
-
-    // Images
-    this.load.image('background', 'assets/maps/background.png');
-    this.load.image('ground', 'assets/platform.png');
-    this.load.image('enemy', 'assets/enemy.png');
-    this.load.image('coin', 'assets/coin.png');
-    this.load.image('key', 'assets/key.png');
-    this.load.image('castle', 'assets/castle.png');
-    this.load.image('heart', 'assets/heart.png');
-
-    // Map JSON (initで受け取ったパスを使用)
-    if (this.currentMapPath) {
-      this.load.json('map', this.currentMapPath);
-    } else {
-      console.error('GameScene: mapPath is not provided.');
-    }
+    // PreloadSceneでアセットは読み込み済みのため、このメソッドは空にします。
   }
 
   create() {
@@ -147,9 +127,9 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Load map objects
-    const mapData = this.cache.json.get('map');
+    const mapData = this.cache.json.get(this.currentStageId!); // '!'でundefinedでないことを表明
     if (!mapData) {
-      throw new Error(`Map data from ${this.currentMapPath} could not be loaded. Check path or JSON syntax.`);
+      throw new Error(`Map data for ${this.currentStageId} could not be loaded. Check key in PreloadScene.`);
     }
     const mapObjects = MapLoader.load(mapData);
 
