@@ -122,7 +122,7 @@ export default class GameScene extends Phaser.Scene {
   // --- Private Methods for Setup ---
 
   private setupWorld(): void {
-    this.add.tileSprite(0, 0, 1600, 320, 'background').setOrigin(0, 0);
+    this.add.tileSprite(0, 0, 1600, 320, 'background').setOrigin(0, 0).setScrollFactor(0);
     this.add.rectangle(0, 300, this.game.config.width as number, 20, 0x000000).setOrigin(0, 0).setScrollFactor(0);
 
     const mapWidth = 1600;
