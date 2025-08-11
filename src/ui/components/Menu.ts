@@ -13,6 +13,7 @@ export interface MenuConfig {
   options: string[];
   startY?: number;
   spacing?: number;
+  lineSpacing?: number;
   fontSize?: string;
   highlightColor?: string;
   highlightTextColor?: string;
@@ -62,6 +63,7 @@ export default class Menu extends Phaser.GameObjects.Container {
       options: config.options,
       startY: config.startY ?? -50,
       spacing: config.spacing ?? 40,
+      lineSpacing: config.lineSpacing ?? 0,
       fontSize: config.fontSize ?? UIConstants.FontSize.Large,
       highlightColor: config.highlightColor ?? UIConstants.Color.Yellow,
       highlightTextColor: config.highlightTextColor ?? UIConstants.Color.Black,
@@ -95,7 +97,7 @@ export default class Menu extends Phaser.GameObjects.Container {
       // 基本スタイルと上書きスタイルをマージ
       const finalStyle = { ...baseStyle, ...overrideStyle };
 
-      const y = this.config.startY + (index * this.config.spacing);
+      const y = this.config.startY + (index * (this.config.spacing + this.config.lineSpacing));
       const menuItem = this.scene.add.text(0, y, option, finalStyle)
         .setOrigin(0.5);
       this.add(menuItem);

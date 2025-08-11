@@ -25,7 +25,7 @@ const ENEMY_DAMAGE = 1; // 敵がプレイヤーに与えるダメージ量
  */
 export default class Enemy extends BaseObject {
   // --- プロパティ定義 ---
-  readonly speed: number;
+  speed: number;
   health: number;
   readonly damage: number;
   private aiController?: IAIController; // この敵を制御するAIコントローラー
@@ -62,9 +62,11 @@ export default class Enemy extends BaseObject {
    * このメソッドを呼ぶことで、新品同様の状態に戻すことができます。
    *
    * @param {IAIController} aiController - この敵を制御するAIコントローラー。
+   * @param {number} [speed=ENEMY_SPEED] - 敵の速度。指定がなければデフォルト値を使用。
    */
-  public initialize(aiController: IAIController): void {
+  public initialize(aiController: IAIController, speed: number = ENEMY_SPEED): void {
     this.health = ENEMY_HEALTH; // HPをリセット
+    this.speed = speed; // 速度を設定
     this.aiController = aiController; // AIコントローラーを設定
     this.setActive(true); // アクティブ状態にする（updateが呼ばれるようになる）
     this.setVisible(true); // 表示状態にする

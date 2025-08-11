@@ -100,7 +100,7 @@ export default class GameScene extends Phaser.Scene {
     const mapObjects = MapLoader.load(mapData);
 
     // 2. ワールド、入力、イベントリスナーのセットアップ
-    this.setupWorld(mapObjects.backgroundKey);
+    this.setupWorld(mapObjects.backgroundKey, mapData.width * 32, mapData.height * 16);
     this.setupInput();
     this.setupEventListeners();
 
@@ -148,18 +148,19 @@ export default class GameScene extends Phaser.Scene {
   /**
    * ワールド（背景、物理境界、プラットフォーム）をセットアップします。
    * @param {string} backgroundKey - 背景に使用するテクスチャのキー。
+   * @param {number} mapWidth - マップの幅（ピクセル単位）。
+   * @param {number} mapHeight - マップの高さ（ピクセル単位）。
    */
-  private setupWorld(backgroundKey: string): void {
+  private setupWorld(backgroundKey: string, mapWidth: number, mapHeight: number): void {
+
     // 背景画像（タイル状に表示）
-    this.add.tileSprite(0, 0, 1600, 320, backgroundKey).setOrigin(0, 0).setScrollFactor(0);
+    this.add.tileSprite(0, 0, mapWidth, mapHeight, backgroundKey).setOrigin(0, 0).setScrollFactor(0);
     // 地面（見た目のみ）
-    this.add.rectangle(0, 300, this.game.config.width as number, 20, 0x000000).setOrigin(0, 0).setScrollFactor(0);
+    this.add.rectangle(0, 300, mapWidth, 20, 0x000000).setOrigin(0, 0).setScrollFactor(1);
 
     // 物理ワールドとカメラの境界を設定
-    const mapWidth = 1600;
-    const mapHeight = 300;
-    this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
-    this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+    this.physics.world.setBounds(0, 0, mapWidth, 300);
+    this.cameras.main.setBounds(0, 0, mapWidth, 300);
 
     // プラットフォームを生成
     this.platforms = this.physics.add.staticGroup();
@@ -222,8 +223,10 @@ export default class GameScene extends Phaser.Scene {
       const enemy = this.enemies.get(e.x, e.y) as Enemy;
       if (enemy) {
         const bounds = new Phaser.Geom.Rectangle(e.x - 100, e.y - 100, 200, 100);
+        const speed = this.currentStageId === 'level2' ? 100 : 50;
+
         const aiController = new WanderController(bounds, enemy);
-        enemy.initialize(aiController);
+        enemy.initialize(aiController, speed);
       }
     });
     // コインを生成

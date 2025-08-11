@@ -3,7 +3,7 @@ import WebFontLoader from 'webfontloader';
 
 // 最低でもこの時間だけはローディング画面を表示する（ミリ秒）。
 // 読み込みが一瞬で終わると、画面がちらついて見えるのを防ぐためのUX改善策。
-const MIN_LOADING_TIME = 2000;
+const MIN_LOADING_TIME = 1500;
 
 /**
  * @class PreloadScene
@@ -103,6 +103,7 @@ export default class PreloadScene extends Phaser.Scene {
 
     // 画像
     this.load.image('background', 'assets/maps/background.png');
+    this.load.image('background-dessert', 'assets/maps/background-dessert.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('enemy', 'assets/enemy.png');
     this.load.image('coin', 'assets/coin.png');
@@ -112,6 +113,7 @@ export default class PreloadScene extends Phaser.Scene {
 
     // マップデータ (JSON)
     this.load.json('level1', 'assets/maps/level1.json');
+    this.load.json('level2', 'assets/maps/level2.json');
 
     // クイズデータ (JSON)
     this.load.json('quiz_db', 'assets/quiz/quiz_db.json');

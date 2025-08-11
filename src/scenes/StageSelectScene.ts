@@ -25,13 +25,17 @@ import { CommonBackground } from '../ui/views/CommonBackground';
  */
 export default class StageSelectScene extends Phaser.Scene {
   // 将来的なステージ追加を容易にするためのステージ定義配列
-  private stages = [{ id: 'level1', name: 'レベル１', mapPath: 'assets/maps/level1.json' }];
+  private stages = [
+    { id: 'level1', name: 'レベル１', mapPath: 'assets/maps/level1.json' },
+    { id: 'level2', name: 'レベル２', mapPath: 'assets/maps/level2.json' },
+  ];
   private menu!: Menu;
   private commonBackground!: CommonBackground;
 
   // このシーン専用のショートカットキー
   private escKey?: Phaser.Input.Keyboard.Key;
   private oneKey?: Phaser.Input.Keyboard.Key;
+  private twoKey?: Phaser.Input.Keyboard.Key;
 
   constructor() {
     super('StageSelectScene');
@@ -66,6 +70,7 @@ export default class StageSelectScene extends Phaser.Scene {
       options: this.stages.map(s => s.name),
       fontSize: UIConstants.FontSize.Large, // フォントサイズ
       startY: 0,                    // 開始Y座標（コンテナ中心からのオフセット）
+      spacing: 30,                  // 行間を狭くする
     });
 
     // Menuコンポーネントが'selected'イベントを発行したら、selectStageメソッドを呼び出す
@@ -74,7 +79,7 @@ export default class StageSelectScene extends Phaser.Scene {
     });
 
     // パネル内に操作説明テキストを配置
-    const instructionText = '↑/↓: 移動\n1: 直接選択\nEnter: 決定\nEsc: タイトルに戻る';
+    const instructionText = '↑/↓: 移動, Enter: 決定\n1-2: 直接選択, Esc: タイトルに戻る';
     RetroUI.createInstructionText(
       panel.scene,
       panel,
@@ -86,11 +91,13 @@ export default class StageSelectScene extends Phaser.Scene {
     // ショートカットキー設定
     this.escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     this.oneKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+    this.twoKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
 
     // Escキーでタイトルシーンに戻る
     this.escKey.on('down', () => this.scene.start('TitleScene'));
     // 数字の1キーで最初のステージを直接選択する
     this.oneKey.on('down', () => this.selectStage(0));
+    this.twoKey.on('down', () => this.selectStage(1));
 
     // シーンが終了する際に、登録したイベントリスナーをクリーンアップする
     this.events.once('shutdown', this.cleanup, this);
@@ -120,5 +127,6 @@ export default class StageSelectScene extends Phaser.Scene {
     // ?. (オプショナルチェイニング) を使って、キーが未定義の場合でもエラーが発生しないようにする
     this.escKey?.off('down');
     this.oneKey?.off('down');
+    this.twoKey?.off('down');
   }
 }
