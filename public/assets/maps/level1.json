@@ -11,67 +11,42 @@
           "name": "",
           "type": "player",
           "x": 100,
-          "y": 250,
-          "properties": {
-            "speed": 200,
-            "jumpForce": 360,
-            "maxHealth": 1
-          }
+          "y": 150
         },
         {
           "id": 2,
           "name": "",
           "type": "enemy",
           "x": 600,
-          "y": 190,
-          "properties": {
-            "speed": 100,
-            "health": 3,
-            "damage": 1
-          }
+          "y": 190
         },
         {
           "id": 3,
           "name": "",
           "type": "coin",
           "x": 300,
-          "y": 190,
-          "properties": {
-            "value": 10,
-            "spinSpeed": 2
-          }
+          "y": 190
         },
         {
           "id": 4,
           "name": "",
           "type": "key",
           "x": 800,
-          "y": 190,
-          "properties": {
-            "keyId": "door1",
-            "color": "gold"
-          }
+          "y": 190
         },
         {
           "id": 5,
           "name": "",
           "type": "castle",
           "x": 1550,
-          "y": 278,
-          "properties": {
-            "level": 1,
-            "requiredKeys": 3
-          }
+          "y": 278
         },
         {
           "id": 6,
           "name": "",
           "type": "heart",
           "x": 500,
-          "y": 190,
-          "properties": {
-            "healAmount": 1
-          }
+          "y": 190
         }
       ]
     }

@@ -1,41 +1,25 @@
 import BaseObject from '../../core/game-objects/BaseObject';
 
-// Tiledから渡されるプロパティの型定義
-export interface CoinConfig {
-  value?: number;
-  spinSpeed?: number;
-}
-
-// デフォルト値
-const DEFAULT_COIN_CONFIG: Required<CoinConfig> = {
-  value: 1,
-  spinSpeed: 1,
-};
+// コインの基本性能をコードで定義
+const COIN_VALUE = 1;
+const COIN_SPIN_SPEED = 1;
 
 export default class Coin extends BaseObject {
-  value: number;
-  spinSpeed: number;
+  readonly value: number;
+  readonly spinSpeed: number;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, config: CoinConfig = {}) {
+  constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'coin');
 
-    // デフォルト値とTiledからの設定をマージ
-    const finalConfig = { ...DEFAULT_COIN_CONFIG, ...config };
-
-    this.value = finalConfig.value;
-    this.spinSpeed = finalConfig.spinSpeed;
+    this.value = COIN_VALUE;
+    this.spinSpeed = COIN_SPIN_SPEED;
 
     this.setOrigin(0.5, 0.5);
     this.setImmovable(true);
   }
 
   // プールから再利用される際に呼ばれる初期化メソッド
-  public initialize(config: CoinConfig = {}): void {
-    // デフォルト値とTiledからの設定をマージ
-    const finalConfig = { ...DEFAULT_COIN_CONFIG, ...config };
-    this.value = finalConfig.value;
-    this.spinSpeed = finalConfig.spinSpeed;
-
+  public initialize(): void {
     this.setActive(true);
     this.setVisible(true);
     if (this.body) {

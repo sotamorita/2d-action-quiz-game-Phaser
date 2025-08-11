@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import Player from '../../features/player/Player';
+import Player, { PlayerState } from '../../features/player/Player';
 import Coin from '../../features/items/Coin';
 import Enemy from '../../features/enemies/Enemy';
 import Heart from '../../features/items/Heart';
@@ -67,7 +67,9 @@ export default class CollisionSystem {
    * PlayerとEnemyが衝突したときの処理
    */
   private handlePlayerEnemyCollision(player: any, enemy: any): void {
-    this.scene.events.emit('enemy-collided', player as Player, enemy as Enemy);
+    const playerObject = player as Player;
+    if (playerObject.state === PlayerState.DEAD || playerObject.state === PlayerState.INVINCIBLE) return;
+    this.scene.events.emit('enemy-collided', playerObject, enemy as Enemy);
   }
 
   /**

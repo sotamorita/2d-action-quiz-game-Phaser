@@ -1,33 +1,24 @@
 import BaseObject from '../../core/game-objects/BaseObject';
 
-// Tiledから渡されるプロパティの型定義
-export interface CastleConfig {
-  level?: number;
-  requiredKeys?: number;
-}
-
-// デフォルト値
-const DEFAULT_CASTLE_CONFIG: Required<CastleConfig> = {
-  level: 1,
-  requiredKeys: 1,
-};
+// 城の基本性能をコードで定義
+const CASTLE_LEVEL = 1;
+const REQUIRED_KEYS = 1;
 
 export default class Castle extends BaseObject {
-  level: number;
-  requiredKeys: number;
+  readonly level: number;
+  readonly requiredKeys: number;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, config: CastleConfig = {}) {
+  constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'castle');
 
-    // デフォルト値とTiledからの設定をマージ
-    const finalConfig = { ...DEFAULT_CASTLE_CONFIG, ...config };
-
-    this.level = finalConfig.level;
-    this.requiredKeys = finalConfig.requiredKeys;
+    this.level = CASTLE_LEVEL;
+    this.requiredKeys = REQUIRED_KEYS;
 
     this.setOrigin(0.5, 0.5);
     this.setImmovable(true);
+  }
 
+  public initialize(): void {
     // 城のアニメーションやエフェクトがあればここで追加
   }
 }

@@ -1,15 +1,13 @@
 import Phaser from 'phaser';
-import Player, { PlayerConfig } from '../features/player/Player';
-import Enemy, { EnemyConfig } from '../features/enemies/Enemy';
-import Coin, { CoinConfig } from '../features/items/Coin';
+import Player, { PlayerState } from '../features/player/Player';
+import Enemy from '../features/enemies/Enemy';
+import Coin from '../features/items/Coin';
 import Key from '../features/items/Key';
 import Castle from '../features/castle/Castle';
 import MapLoader, { MapObjects } from '../core/data/MapLoader';
-import Heart, { HeartConfig } from '../features/items/Heart';
+import Heart from '../features/items/Heart';
 import CollisionSystem from '../core/systems/CollisionSystem';
 import GameUIView from '../ui/views/GameUIView';
-
-const INVINCIBILITY_DURATION = 3000; // 3秒の無敵時間
 
 export default class GameScene extends Phaser.Scene {
   // オブジェクト
@@ -168,27 +166,27 @@ export default class GameScene extends Phaser.Scene {
   private createMapObjects(mapObjects: MapObjects): void {
     mapObjects.enemies.forEach(e => {
       const enemy = this.enemies.get(e.x, e.y) as Enemy;
-      if (enemy) enemy.initialize(e.properties as EnemyConfig);
+      if (enemy) enemy.initialize();
     });
     mapObjects.coins.forEach(c => {
       const coin = this.coins.get(c.x, c.y) as Coin;
-      if (coin) coin.initialize(c.properties as CoinConfig);
+      if (coin) coin.initialize();
     });
     mapObjects.hearts.forEach(h => {
       const heart = this.hearts.get(h.x, h.y) as Heart;
-      if (heart) heart.initialize(h.properties as HeartConfig);
+      if (heart) heart.initialize();
     });
 
     if (mapObjects.keys.length > 0) {
       const keyConfig = mapObjects.keys[0];
       const key = this.keys.get(keyConfig.x, keyConfig.y) as Key;
       if (key) {
-        key.initialize(keyConfig.properties);
+        key.initialize();
       }
     }
     if (mapObjects.castles.length > 0) {
       const castleConfig = mapObjects.castles[0];
-      this.castle = new Castle(this, castleConfig.x, castleConfig.y, castleConfig.properties);
+      this.castle = new Castle(this, castleConfig.x, castleConfig.y);
       this.castle.initialize();
     }
   }
@@ -197,9 +195,18 @@ export default class GameScene extends Phaser.Scene {
     if (!playerConfig) {
       throw new Error('Map data does not define a player.');
     }
-    this.player = new Player(this, playerConfig.x, playerConfig.y, playerConfig.properties as PlayerConfig);
+    this.player = new Player(this, playerConfig.x, playerConfig.y);
     this.player.setDepth(10);
     this.player.initialize();
+
+    // 死亡アニメーション完了イベントをリッスン
+    this.player.on('death-animation-complete', () => {
+      this.scene.start('GameOverScene', {
+        stageId: this.currentStageId,
+        mapPath: this.currentMapPath,
+        score: this.gameUIView.getScore()
+      });
+    });
 
     if (!this.anims.exists('left')) {
       this.anims.create({ key: 'left', frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }), frameRate: 10, repeat: -1 });
@@ -223,7 +230,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private handleEnemyCollision(player: Player, enemy: Enemy): void {
-    if (this.player.isInvincible || !enemy.active) return;
+    if (!enemy.active) return;
 
     this.currentEnemy = enemy;
     if (this.player.body) this.player.body.enable = false;
@@ -268,16 +275,8 @@ export default class GameScene extends Phaser.Scene {
       }
     } else {
       this.player.damage(1);
-      this.player.startInvincibility(INVINCIBILITY_DURATION);
-
-      if (this.player.health <= 0) {
-        this.scene.stop();
-        this.scene.start('GameOverScene', {
-          stageId: this.currentStageId,
-          mapPath: this.currentMapPath,
-          score: this.gameUIView.getScore()
-        });
-        return;
+      if (this.player.state !== PlayerState.DEAD) {
+        this.player.transitionToState(PlayerState.INVINCIBLE);
       }
 
       if (this.currentEnemy?.body) {
@@ -291,6 +290,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private cleanup(): void {
+    if (this.player) {
+      this.player.off('death-animation-complete');
+    }
     this.events.off('quiz-completed', this.handleQuizResult, this);
     this.events.off('pause', this.onScenePause, this);
     this.events.off('resume', this.onSceneResume, this);
