@@ -26,15 +26,15 @@ export default class WanderController implements IAIController {
 
     this.changeDirectionTimer -= delta;
 
-    const isBlocked = enemy.body.blocked.left || enemy.body.blocked.right || enemy.body.blocked.up || enemy.body.blocked.down;
-    const isOutOfBounds = this.isOutOfBounds(enemy);
-
-    if (this.changeDirectionTimer <= 0 || isBlocked || isOutOfBounds) {
+    // 時間経過でのみ、ランダムな方向転換を行う
+    if (this.changeDirectionTimer <= 0) {
       this.setRandomVelocity(enemy);
       this.changeDirectionTimer = 5000;
     }
 
-    if (isOutOfBounds) {
+    // 境界外に出た、または壁に衝突した場合の反射処理
+    const isBlocked = enemy.body.blocked.left || enemy.body.blocked.right || enemy.body.blocked.up || enemy.body.blocked.down;
+    if (this.isOutOfBounds(enemy) || isBlocked) {
       this.bringBackInBounds(enemy);
     }
   }
@@ -47,29 +47,43 @@ export default class WanderController implements IAIController {
   }
 
   private isOutOfBounds(enemy: Enemy): boolean {
+    const bounds = enemy.getBounds();
     return (
-      enemy.x < this.bounds.left ||
-      enemy.x > this.bounds.right ||
-      enemy.y < this.bounds.top ||
-      enemy.y > this.bounds.bottom
+      bounds.left < this.bounds.left ||
+      bounds.right > this.bounds.right ||
+      bounds.top < this.bounds.top ||
+      bounds.bottom > this.bounds.bottom
     );
   }
 
   private bringBackInBounds(enemy: Enemy): void {
-    if (enemy.x < this.bounds.left) {
-      enemy.x = this.bounds.left;
-      enemy.body!.velocity.x *= -1;
-    } else if (enemy.x > this.bounds.right) {
-      enemy.x = this.bounds.right;
-      enemy.body!.velocity.x *= -1;
+    const body = enemy.body as Phaser.Physics.Arcade.Body;
+    const spriteBounds = enemy.getBounds();
+
+    // X軸の反射
+    if (spriteBounds.left < this.bounds.left) {
+      body.x = this.bounds.left;
+      body.velocity.x = Math.abs(body.velocity.x); // 必ず正の方向（右）へ
+    } else if (spriteBounds.right > this.bounds.right) {
+      body.x = this.bounds.right - spriteBounds.width;
+      body.velocity.x = -Math.abs(body.velocity.x); // 必ず負の方向（左）へ
+    } else if (body.blocked.left) {
+      body.velocity.x = Math.abs(body.velocity.x);
+    } else if (body.blocked.right) {
+      body.velocity.x = -Math.abs(body.velocity.x);
     }
 
-    if (enemy.y < this.bounds.top) {
-      enemy.y = this.bounds.top;
-      enemy.body!.velocity.y *= -1;
-    } else if (enemy.y > this.bounds.bottom) {
-      enemy.y = this.bounds.bottom;
-      enemy.body!.velocity.y *= -1;
+    // Y軸の反射
+    if (spriteBounds.top < this.bounds.top) {
+      body.y = this.bounds.top;
+      body.velocity.y = Math.abs(body.velocity.y); // 必ず正の方向（下）へ
+    } else if (spriteBounds.bottom > this.bounds.bottom) {
+      body.y = this.bounds.bottom - spriteBounds.height;
+      body.velocity.y = -Math.abs(body.velocity.y); // 必ず負の方向（上）へ
+    } else if (body.blocked.up) {
+      body.velocity.y = Math.abs(body.velocity.y);
+    } else if (body.blocked.down) {
+      body.velocity.y = -Math.abs(body.velocity.y);
     }
   }
 }

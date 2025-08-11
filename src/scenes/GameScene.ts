@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import Player, { PlayerState } from '../features/player/Player';
 import Enemy from '../features/enemies/Enemy';
-import { WanderController } from '../features/enemies/ai';
+import { IAIController, WanderController } from '../features/enemies/ai';
 import Coin from '../features/items/Coin';
 import Key from '../features/items/Key';
 import Castle from '../features/castle/Castle';
@@ -169,7 +169,7 @@ export default class GameScene extends Phaser.Scene {
       const enemy = this.enemies.get(e.x, e.y) as Enemy;
       if (enemy) {
         // 敵の初期位置を中心とした 200x100 の矩形を移動範囲とする
-        const bounds = new Phaser.Geom.Rectangle(e.x - 100, e.y - 50, 200, 100);
+        const bounds = new Phaser.Geom.Rectangle(e.x - 100, e.y - 100, 200, 100);
         const aiController = new WanderController(bounds, enemy);
         enemy.initialize(aiController);
       }

@@ -43,6 +43,8 @@ export default class Player extends BaseObject {
   ) {
     super(scene, x, y, 'player');
 
+    this.setOrigin(0, 1);
+
     // body に型アサーション（以降、すべての body 操作で安全）
     const body = this.body as Phaser.Physics.Arcade.Body;
 
