@@ -1,7 +1,25 @@
 import Phaser from 'phaser';
 
+// 定数
+const PLAYER_GRAVITY = 950;
+const PLAYER_BOUNCE = 0.1;
+const INVINCIBILITY_DURATION = 3000;
+const BLINK_DURATION = 100;
+
+const ANIMATIONS = {
+  LEFT: 'left',
+  RIGHT: 'right',
+  TURN: 'turn'
+};
+
+// Tiledから渡されるプロパティの型定義
+export interface PlayerConfig {
+  speed: number;
+  jumpForce: number;
+  maxHealth: number;
+}
+
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   speed: number;
   jumpForce: number;
   maxHealth: number;
@@ -14,8 +32,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene: Phaser.Scene,
     x: number,
     y: number,
-    cursors: Phaser.Types.Input.Keyboard.CursorKeys,
-    properties: Record<string, any> = {}
+    config: PlayerConfig
   ) {
     super(scene, x, y, 'player');
 
@@ -26,20 +43,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     // body に型アサーション（以降、すべての body 操作で安全）
     const body = this.body as Phaser.Physics.Arcade.Body;
 
-    body.setGravityY(950);         // 重力を下方向にかける
-    this.setBounce(0.1);           // 軽く跳ねる
-    this.setCollideWorldBounds(true); // 画面端で止まる
+    body.setGravityY(PLAYER_GRAVITY);
+    this.setBounce(PLAYER_BOUNCE);
+    this.setCollideWorldBounds(true);
 
-    this.cursors = cursors;
-
-    // Tiledプロパティ
-    this.speed = properties.speed ?? 1000;
-    this.jumpForce = properties.jumpForce ?? 700;
-    this.maxHealth = properties.maxHealth ?? 5;
+    // Tiledから読み込んだ設定を適用
+    this.speed = config.speed;
+    this.jumpForce = config.jumpForce;
+    this.maxHealth = config.maxHealth;
     this.health = this.maxHealth;
   }
 
-  startInvincibility(duration: number = 3000) {
+  startInvincibility(duration: number = INVINCIBILITY_DURATION) {
     if (this.isInvincible) return;
     this.isInvincible = true;
 
@@ -49,7 +64,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       alpha: 0.3,
       yoyo: true,
       repeat: -1,
-      duration: 100
+      duration: BLINK_DURATION
     });
 
     // タイマーで無敵解除
@@ -69,14 +84,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     // 横移動
     if (leftIsDown) {
       this.setVelocityX(-this.speed);
-      this.anims.play('left', true);
+      this.anims.play(ANIMATIONS.LEFT, true);
     } else if (rightIsDown) {
       this.setVelocityX(this.speed);
-      this.anims.play('right', true);
+      this.anims.play(ANIMATIONS.RIGHT, true);
     } else if (body.blocked.down) {
       // 地上にいる時のみ速度を0にする（空中では慣性を保持）
       this.setVelocityX(0);
-      this.anims.play('turn');
+      this.anims.play(ANIMATIONS.TURN);
     }
 
     // ジャンプ（地面にいるときのみ）

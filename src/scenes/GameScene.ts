@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import Player from '../objects/Player';
+import Player, { PlayerConfig } from '../objects/Player';
 import Enemy from '../objects/Enemy';
 import Coin from '../objects/Coin';
 import Key from '../objects/Key';
@@ -180,8 +180,7 @@ export default class GameScene extends Phaser.Scene {
       this,
       mapObjects.player.x,
       mapObjects.player.y,
-      this.cursors,
-      mapObjects.player.properties
+      mapObjects.player.properties as PlayerConfig
     );
     this.player.setDepth(10);
     this.physics.add.collider(this.player, this.platforms);
