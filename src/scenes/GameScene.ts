@@ -197,7 +197,6 @@ export default class GameScene extends Phaser.Scene {
     }
     this.player = new Player(this, playerConfig.x, playerConfig.y);
     this.player.setDepth(10);
-    this.player.initialize();
 
     // 死亡アニメーション完了イベントをリッスン
     this.player.on('death-animation-complete', () => {
@@ -217,6 +216,9 @@ export default class GameScene extends Phaser.Scene {
     if (!this.anims.exists('right')) {
       this.anims.create({ key: 'right', frames: this.anims.generateFrameNumbers('player', { start: 5, end: 8 }), frameRate: 10, repeat: -1 });
     }
+
+    // アニメーション生成後に初期化
+    this.player.initialize();
   }
 
   // --- Event Handlers ---

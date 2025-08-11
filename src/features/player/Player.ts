@@ -34,7 +34,7 @@ export default class Player extends BaseObject {
 
   public state = PlayerState.NORMAL;
   private invincibleTimer?: Phaser.Time.TimerEvent;
-  private lastDirection: 'left' | 'right' = 'right';
+  private lastDirection: 'left' | 'right' | 'turn' = 'turn';
 
   constructor(
     scene: Phaser.Scene,
@@ -63,6 +63,8 @@ export default class Player extends BaseObject {
   public initialize(): void {
     this.anims.play(ANIMATIONS.TURN, true);
     this.state = PlayerState.NORMAL;
+    this.setVelocity(0, 0);
+    this.lastDirection = 'turn';
   }
 
   public transitionToState(newState: PlayerState, data?: any): void {
@@ -124,28 +126,29 @@ export default class Player extends BaseObject {
     const body = this.body as Phaser.Physics.Arcade.Body;
     const onGround = body.blocked.down;
 
-    // --- 物理挙動の制御 ---
+    // --- 物理挙動と向きの状態管理 ---
+    if (leftIsDown) {
+      this.setVelocityX(-this.speed);
+      this.lastDirection = 'left';
+    } else if (rightIsDown) {
+      this.setVelocityX(this.speed);
+      this.lastDirection = 'right';
+    }
+
     if (onGround) {
       body.setDragX(PLAYER_DRAG);
-      if (leftIsDown) {
-        this.setVelocityX(-this.speed);
-        this.lastDirection = 'left';
-      } else if (rightIsDown) {
-        this.setVelocityX(this.speed);
-        this.lastDirection = 'right';
+      // 地上で左右キーが押されておらず、速度が十分落ちたら向きを 'turn' にする
+      if (!leftIsDown && !rightIsDown) {
+        if (Math.abs(body.velocity.x) <= 10) {
+          this.lastDirection = 'turn';
+        }
       }
       if (jumpIsDown) {
         this.setVelocityY(-this.jumpForce);
       }
     } else {
+      // 空中ではドラッグを0に
       body.setDragX(0);
-      if (leftIsDown) {
-        this.setVelocityX(-this.speed);
-        this.lastDirection = 'left';
-      } else if (rightIsDown) {
-        this.setVelocityX(this.speed);
-        this.lastDirection = 'right';
-      }
     }
 
     // --- アニメーションの制御 ---
@@ -158,13 +161,15 @@ export default class Player extends BaseObject {
     let newAnimKey = this.anims.currentAnim?.key;
 
     if (onGround) {
-      if (Math.abs(body.velocity.x) > 10) {
+      if (this.lastDirection !== 'turn') {
         newAnimKey = this.lastDirection;
       } else {
         newAnimKey = ANIMATIONS.TURN;
       }
     } else {
-      if (this.anims.currentAnim?.key !== ANIMATIONS.TURN) {
+      // 空中にいるときは、最後の移動方向を維持する
+      // 'turn' の場合は、ジャンプ開始時のアニメーション(turn)を維持
+      if (this.lastDirection !== 'turn') {
         newAnimKey = this.lastDirection;
       }
     }
