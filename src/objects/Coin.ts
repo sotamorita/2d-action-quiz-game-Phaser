@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import BaseObject from './BaseObject';
 
 // Tiledから渡されるプロパティの型定義
 export interface CoinConfig {
@@ -12,14 +12,12 @@ const DEFAULT_COIN_CONFIG: Required<CoinConfig> = {
   spinSpeed: 1,
 };
 
-export default class Coin extends Phaser.Physics.Arcade.Sprite {
+export default class Coin extends BaseObject {
   value: number;
   spinSpeed: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: CoinConfig = {}) {
     super(scene, x, y, 'coin');
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
 
     // デフォルト値とTiledからの設定をマージ
     const finalConfig = { ...DEFAULT_COIN_CONFIG, ...config };

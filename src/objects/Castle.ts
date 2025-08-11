@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import BaseObject from './BaseObject';
 
 // Tiledから渡されるプロパティの型定義
 export interface CastleConfig {
@@ -12,14 +12,12 @@ const DEFAULT_CASTLE_CONFIG: Required<CastleConfig> = {
   requiredKeys: 1,
 };
 
-export default class Castle extends Phaser.Physics.Arcade.Sprite {
+export default class Castle extends BaseObject {
   level: number;
   requiredKeys: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: CastleConfig = {}) {
     super(scene, x, y, 'castle');
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
 
     // デフォルト値とTiledからの設定をマージ
     const finalConfig = { ...DEFAULT_CASTLE_CONFIG, ...config };

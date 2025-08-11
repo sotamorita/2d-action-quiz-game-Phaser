@@ -159,17 +159,31 @@ export default class GameScene extends Phaser.Scene {
     this.hearts = this.physics.add.group();
 
     // Create objects from configs
-    mapObjects.enemies.forEach(e => this.enemies.add(new Enemy(this, e.x, e.y, e.properties)));
-    mapObjects.coins.forEach(c => this.coins.add(new Coin(this, c.x, c.y, c.properties)));
-    mapObjects.hearts.forEach(h => this.hearts.add(new Heart(this, h.x, h.y, h.properties)));
+    mapObjects.enemies.forEach(e => {
+      const enemy = new Enemy(this, e.x, e.y, e.properties);
+      this.enemies.add(enemy);
+      enemy.initialize();
+    });
+    mapObjects.coins.forEach(c => {
+      const coin = new Coin(this, c.x, c.y, c.properties);
+      this.coins.add(coin);
+      coin.initialize();
+    });
+    mapObjects.hearts.forEach(h => {
+      const heart = new Heart(this, h.x, h.y, h.properties);
+      this.hearts.add(heart);
+      heart.initialize();
+    });
 
     if (mapObjects.keys.length > 0) {
       const keyConfig = mapObjects.keys[0];
       this.key = new Key(this, keyConfig.x, keyConfig.y, keyConfig.properties);
+      this.key.initialize();
     }
     if (mapObjects.castles.length > 0) {
       const castleConfig = mapObjects.castles[0];
       this.castle = new Castle(this, castleConfig.x, castleConfig.y, castleConfig.properties);
+      this.castle.initialize();
     }
 
     // Player
@@ -218,6 +232,9 @@ export default class GameScene extends Phaser.Scene {
         repeat: -1
       });
     }
+
+    // Initialize player animation
+    this.player.initialize();
 
     // --- UI first (avoid race if overlaps fire immediately) ---
     this.scoreText = RetroUI.createSimpleText(this, 16, 16, 'Score: 0', {

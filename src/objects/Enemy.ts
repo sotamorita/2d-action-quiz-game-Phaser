@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import BaseObject from './BaseObject';
 
 // Tiledから渡されるプロパティの型定義
 export interface EnemyConfig {
@@ -14,16 +14,13 @@ const DEFAULT_ENEMY_CONFIG: Required<EnemyConfig> = {
   damage: 1,
 };
 
-export default class Enemy extends Phaser.Physics.Arcade.Sprite {
+export default class Enemy extends BaseObject {
   speed: number;
   health: number;
   damage: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyConfig = {}) {
     super(scene, x, y, 'enemy');
-
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
 
     this.setImmovable(true);
     this.setCollideWorldBounds(true);

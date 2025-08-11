@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import BaseObject from './BaseObject';
 
 // 定数
 const PLAYER_GRAVITY = 950;
@@ -19,7 +19,7 @@ export interface PlayerConfig {
   maxHealth: number;
 }
 
-export default class Player extends Phaser.Physics.Arcade.Sprite {
+export default class Player extends BaseObject {
   speed: number;
   jumpForce: number;
   maxHealth: number;
@@ -36,10 +36,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   ) {
     super(scene, x, y, 'player');
 
-    // プレイヤーをシーンに追加・物理演算を有効化
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
-
     // body に型アサーション（以降、すべての body 操作で安全）
     const body = this.body as Phaser.Physics.Arcade.Body;
 
@@ -52,6 +48,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.jumpForce = config.jumpForce;
     this.maxHealth = config.maxHealth;
     this.health = this.maxHealth;
+  }
+
+  public initialize(): void {
+    this.anims.play(ANIMATIONS.TURN);
   }
 
   startInvincibility(duration: number = INVINCIBILITY_DURATION) {

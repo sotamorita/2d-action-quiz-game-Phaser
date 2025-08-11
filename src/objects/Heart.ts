@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import BaseObject from './BaseObject';
 
 // Tiledから渡されるプロパティの型定義
 export interface HeartConfig {
@@ -10,13 +10,11 @@ const DEFAULT_HEART_CONFIG: Required<HeartConfig> = {
   healAmount: 1,
 };
 
-export default class Heart extends Phaser.Physics.Arcade.Sprite {
+export default class Heart extends BaseObject {
   healAmount: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: HeartConfig = {}) {
     super(scene, x, y, 'heart');
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
 
     // デフォルト値とTiledからの設定をマージ
     const finalConfig = { ...DEFAULT_HEART_CONFIG, ...config };

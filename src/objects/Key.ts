@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import BaseObject from './BaseObject';
 
 // Tiledから渡されるプロパティの型定義
 export interface KeyConfig {
@@ -12,14 +12,12 @@ const DEFAULT_KEY_CONFIG: Required<KeyConfig> = {
   color: 'gold',
 };
 
-export default class Key extends Phaser.Physics.Arcade.Sprite {
+export default class Key extends BaseObject {
   keyId: string;
   color: string;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: KeyConfig = {}) {
     super(scene, x, y, 'key');
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
 
     // デフォルト値とTiledからの設定をマージ
     const finalConfig = { ...DEFAULT_KEY_CONFIG, ...config };
