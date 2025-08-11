@@ -16,17 +16,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* font-family はPhaser側で指定するため削除 */
 }
 
-/* ゲームコンテナ - Phaserに任せる */
-#game-container {
-  /* 装飾：ピクセルアート風の枠線と影 */
-  border: 2px solid #777; /* 細めのピクセルアート風の枠線 */
-  box-shadow: 4px 4px 0px #333, 8px 8px 0px #222; /* 二重のピクセル影 */
-  padding: 5px; /* 枠線とゲーム画面の間に余白 */
-  background-color: #333; /* 枠内の背景色 */
-}
 
 /* キャンバスはPhaserが制御 */
 canvas {

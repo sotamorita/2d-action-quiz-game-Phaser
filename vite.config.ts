@@ -1,6 +1,12 @@
 import { defineConfig } from 'vite';
+import string from 'vite-plugin-string';
 
 export default defineConfig({
+  plugins: [
+    string({
+      include: '**/*.glsl', // .glsl ファイルを文字列としてインポート
+    }),
+  ],
   root: '.',
   base: '/2d-action-quiz-game-Phaser/', // GitHub Pagesのリポジトリ名に合わせる
   publicDir: 'public',

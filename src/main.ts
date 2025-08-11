@@ -7,6 +7,7 @@ import ClearScene from './scenes/ClearScene';
 import GameOverScene from './scenes/GameOverScene';
 import PauseOverlayScene from './scenes/PauseOverlayScene';
 import QuizCategorySelectScene from './scenes/QuizCategorySelectScene';
+import BootScene from './scenes/BootScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -32,7 +33,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false
     }
   },
-  scene: [TitleScene, StageSelectScene, GameScene, QuizScene, ClearScene, GameOverScene, PauseOverlayScene, QuizCategorySelectScene]
+  scene: [BootScene, TitleScene, StageSelectScene, GameScene, QuizScene, ClearScene, GameOverScene, PauseOverlayScene, QuizCategorySelectScene]
 };
 
 const game = new Phaser.Game(config);
