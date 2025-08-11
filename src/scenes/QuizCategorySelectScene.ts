@@ -46,7 +46,7 @@ export default class QuizCategorySelectScene extends Phaser.Scene {
       panel,
       'Enter: 決定  Esc: タイトルに戻る',
       100, // Y座標
-      { lineSpacing: 10 } // 行間を個別に調整
+      { lineSpacing: 10 } // 行間
     );
 
     this.escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);

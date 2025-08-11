@@ -54,7 +54,7 @@ export default class StageSelectScene extends Phaser.Scene {
       panel,
       instructionText,
       70, // Y座標
-      { lineSpacing: 8 } // 行間を個別に調整
+      { lineSpacing: 8 } // 行間
     );
 
     // ショートカットキー設定

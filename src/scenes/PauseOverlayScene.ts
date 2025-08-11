@@ -65,7 +65,7 @@ export default class PauseOverlayScene extends Phaser.Scene {
       panel,
       instructionText,
       90, // Y座標
-      { lineSpacing: 10 } // 行間を個別に調整
+      { lineSpacing: 10 } // 行間
     );
 
     // クリーンアップ設定
