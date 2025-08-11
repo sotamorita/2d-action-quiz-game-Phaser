@@ -77,15 +77,15 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.setupWorld();
-    this.setupInput();
-    this.setupEventListeners();
-
     const mapData = this.cache.json.get(this.currentStageId!);
     if (!mapData) {
       throw new Error(`Map data for ${this.currentStageId} could not be loaded.`);
     }
     const mapObjects = MapLoader.load(mapData);
+
+    this.setupWorld(mapObjects.backgroundKey);
+    this.setupInput();
+    this.setupEventListeners();
 
     this.createGroups();
     this.createMapObjects(mapObjects);
@@ -121,8 +121,8 @@ export default class GameScene extends Phaser.Scene {
 
   // --- Private Methods for Setup ---
 
-  private setupWorld(): void {
-    this.add.tileSprite(0, 0, 1600, 320, 'background').setOrigin(0, 0).setScrollFactor(0);
+  private setupWorld(backgroundKey: string): void {
+    this.add.tileSprite(0, 0, 1600, 320, backgroundKey).setOrigin(0, 0).setScrollFactor(0);
     this.add.rectangle(0, 300, this.game.config.width as number, 20, 0x000000).setOrigin(0, 0).setScrollFactor(0);
 
     const mapWidth = 1600;

@@ -21,6 +21,7 @@ interface TiledMap {
   width: number;
   height: number;
   layers: TiledLayer[];
+  backgroundKey?: string;
 }
 
 // --- Configuration Types for Game Objects ---
@@ -70,6 +71,7 @@ export type MapObjects = {
   hearts: HeartConfig[];
   keys: KeyConfig[];
   castles: CastleConfig[];
+  backgroundKey: string;
 };
 
 /**
@@ -91,6 +93,7 @@ export default class MapLoader {
       hearts: [],
       keys: [],
       castles: [],
+      backgroundKey: tiledData.backgroundKey || 'background',
     };
 
     // Find the 'game_objects' layer
