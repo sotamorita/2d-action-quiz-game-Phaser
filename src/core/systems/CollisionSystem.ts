@@ -62,64 +62,61 @@ export default class CollisionSystem {
     this.scene.physics.add.collider(enemies, enemies);
 
     // --- overlap: 物理的な反発を伴わない接触（すり抜ける） ---
-    // プレイヤーとコイン
-    this.scene.physics.add.overlap(player, coins, this.handlePlayerCoinCollision, undefined, this);
+    const overlapGroups = [
+      { group: coins, event: 'coin-collected' },
+      { group: hearts, event: 'heart-collected' },
+      { group: keys, event: 'key-collected' },
+      { group: enemies, event: 'enemy-collided' },
+    ];
 
-    // プレイヤーと敵
-    this.scene.physics.add.overlap(player, enemies, this.handlePlayerEnemyCollision, undefined, this);
+    for (const g of overlapGroups) {
+      this.scene.physics.add.overlap(
+        player,
+        g.group,
+        (p, obj) =>
+          this.handlePlayerOverlap(
+            p as Player,
+            obj as Phaser.Types.Physics.Arcade.GameObjectWithBody,
+            g.event
+          ),
+        undefined,
+        this
+      );
+    }
 
-    // プレイヤーとハート
-    this.scene.physics.add.overlap(player, hearts, this.handlePlayerHeartCollision, undefined, this);
-
-    // プレイヤーと鍵
-    this.scene.physics.add.overlap(player, keys, this.handlePlayerKeyCollision, undefined, this);
-
-    // プレイヤーと城
     if (castle) {
-      this.scene.physics.add.overlap(player, castle as any, this.handlePlayerCastleCollision, undefined, this);
+      this.scene.physics.add.overlap(
+        player,
+        castle as any,
+        (p, c) =>
+          this.handlePlayerOverlap(
+            p as Player,
+            c as Phaser.Types.Physics.Arcade.GameObjectWithBody,
+            'castle-collided'
+          ),
+        undefined,
+        this
+      );
     }
   }
 
   /**
-   * プレイヤーとコインが接触したときの処理。
-   * 'coin-collected'イベントを発行します。
+   * プレイヤーと他のオブジェクトとの接触を処理する汎用ハンドラ。
+   * @param player プレイヤーオブジェクト
+   * @param object 接触した相手のオブジェクト
+   * @param eventName 発行するイベント名
    */
-  private handlePlayerCoinCollision(player: any, coin: any): void {
-    this.scene.events.emit('coin-collected', coin as Coin);
-  }
+  private handlePlayerOverlap(
+    player: Player,
+    object: Phaser.Types.Physics.Arcade.GameObjectWithBody,
+    eventName: string
+  ): void {
+    // プレイヤーが操作不能な状態（死亡・無敵）の場合は、イベントを発行せずに処理を中断する
+    if (player.state === PlayerState.DEAD || player.state === PlayerState.INVINCIBLE) {
+      return;
+    }
 
-  /**
-   * プレイヤーと敵が接触したときの処理。
-   * 'enemy-collided'イベントを発行します。
-   */
-  private handlePlayerEnemyCollision(player: any, enemy: any): void {
-    const playerObject = player as Player;
-    // プレイヤーが死亡状態または無敵状態の場合は、何もしない
-    if (playerObject.state === PlayerState.DEAD || playerObject.state === PlayerState.INVINCIBLE) return;
-    this.scene.events.emit('enemy-collided', playerObject, enemy as Enemy);
-  }
-
-  /**
-   * プレイヤーとハートが接触したときの処理。
-   * 'heart-collected'イベントを発行します。
-   */
-  private handlePlayerHeartCollision(player: any, heart: any): void {
-    this.scene.events.emit('heart-collected', heart as Heart);
-  }
-
-  /**
-   * プレイヤーと鍵が接触したときの処理。
-   * 'key-collected'イベントを発行します。
-   */
-  private handlePlayerKeyCollision(player: any, key: any): void {
-    this.scene.events.emit('key-collected', key as Key);
-  }
-
-  /**
-   * プレイヤーと城が接触したときの処理。
-   * 'castle-collided'イベントを発行します。
-   */
-  private handlePlayerCastleCollision(player: any, castle: any): void {
-    this.scene.events.emit('castle-collided', castle as Castle);
+    // イベントを発行する
+    this.scene.events.emit(eventName, object);
   }
 }

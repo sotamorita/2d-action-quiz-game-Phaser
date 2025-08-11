@@ -304,8 +304,8 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
-  private handleEnemyCollision(player: Player, enemy: Enemy): void {
-    if (!enemy.active) return;
+  private handleEnemyCollision(enemy: Enemy): void {
+    if (!this.player || !enemy.active) return;
 
     this.currentEnemy = enemy;
     if (this.player.body) this.player.body.enable = false; // プレイヤーの動きを止める

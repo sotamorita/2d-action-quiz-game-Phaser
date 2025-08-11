@@ -154,10 +154,11 @@ export default class Player extends BaseObject {
 
       case PlayerState.DEAD:
         if (!this.body) return;
+        // 物理ボディを無効化し、すべての衝突判定と物理挙動を停止する
+        (this.body as Phaser.Physics.Arcade.Body).enable = false;
+
         // 死亡アニメーションの準備
         this.setCollideWorldBounds(false); // 画面外に出られるように
-        (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(true); // 重力は有効のまま
-        (this.body as Phaser.Physics.Arcade.Body).checkCollision.down = false; // 地面との衝突を無効に
         // 進行方向に応じて飛び上がる向きを変える
         const directionX = this.lastDirection === 'left' ? -1 : 1;
         this.setVelocity(100 * directionX, -300); // 斜め上に飛び上がる
