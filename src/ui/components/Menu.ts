@@ -19,6 +19,8 @@ export interface MenuConfig {
 export default class Menu extends Phaser.GameObjects.Container {
   private selectedIndex = 0;
   private menuItems: Phaser.GameObjects.Text[] = [];
+  private selector!: Phaser.GameObjects.Text;
+  private highlightRect!: Phaser.GameObjects.Rectangle;
   private options: string[];
   private config: Required<Omit<MenuConfig, 'x' | 'y'>>;
 
@@ -54,6 +56,20 @@ export default class Menu extends Phaser.GameObjects.Container {
       this.add(menuItem);
       this.menuItems.push(menuItem);
     });
+
+    // セレクターを作成
+    this.selector = this.scene.add.text(0, 0, '▶', {
+      fontSize: this.config.fontSize,
+      fontFamily: UIConstants.FontFamily,
+      color: UIConstants.Color.White,
+    }).setOrigin(0.5);
+    this.add(this.selector);
+
+    // ハイライト用の長方形を作成
+    this.highlightRect = this.scene.add.rectangle(0, 0, 0, 0, 0xffffff).setVisible(false);
+    this.add(this.highlightRect);
+    // 他のすべての要素の背後に表示
+    this.sendToBack(this.highlightRect);
   }
 
   private setupInputHandlers(): void {
@@ -74,20 +90,38 @@ export default class Menu extends Phaser.GameObjects.Container {
   private updateSelection(): void {
     this.menuItems.forEach((item, index) => {
       const isSelected = index === this.selectedIndex;
-      item.setText(`${isSelected ? '▶ ' : ''}${this.options[index]}`);
       item.setStyle({
-        backgroundColor: isSelected ? this.config.highlightColor : 'transparent',
         color: isSelected ? this.config.highlightTextColor : UIConstants.Color.White,
-        padding: { x: 10, y: 5 }
       });
     });
+
+    const selectedItem = this.menuItems[this.selectedIndex];
+
+    // --- レイアウト調整用の定数 ---
+    const PADDING_X = 35; // ハイライトの左右の余白
+    const PADDING_Y = 5; // ハイライトの上下の余白
+    const SELECTOR_MARGIN = 15; // セレクター(▶)とテキストの間のスペース
+
+    // ハイライト用の長方形の位置とサイズを更新
+    this.highlightRect.setVisible(true);
+    this.highlightRect.setPosition(selectedItem.x - 10, selectedItem.y);
+    this.highlightRect.setSize(selectedItem.width + this.selector.width + PADDING_X, selectedItem.height + PADDING_Y);
+    this.highlightRect.setFillStyle(Phaser.Display.Color.ValueToColor(this.config.highlightColor).color, 1);
+
+    // セレクターの位置を更新
+    this.selector.y = selectedItem.y;
+    const textWidth = selectedItem.getBounds().width;
+    this.selector.x = selectedItem.x - (textWidth / 2) - SELECTOR_MARGIN;
+    this.selector.setColor(this.config.highlightTextColor);
   }
 
   // シーン終了時にキーボードイベントをクリーンアップする
   public destroy(fromScene?: boolean): void {
-    this.scene.input.keyboard!.off('keydown-UP', this.moveSelection);
-    this.scene.input.keyboard!.off('keydown-DOWN', this.moveSelection);
-    this.scene.input.keyboard!.off('keydown-ENTER', this.confirmSelection);
+    if (this.scene && this.scene.input && this.scene.input.keyboard) {
+      this.scene.input.keyboard.off('keydown-UP', this.moveSelection);
+      this.scene.input.keyboard.off('keydown-DOWN', this.moveSelection);
+      this.scene.input.keyboard.off('keydown-ENTER', this.confirmSelection);
+    }
     super.destroy(fromScene);
   }
 }

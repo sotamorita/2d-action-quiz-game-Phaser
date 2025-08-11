@@ -1,31 +1,8 @@
 import Phaser from 'phaser';
 import { RetroUI } from '../ui/RetroUI';
 import { QuizData } from './QuizDataManager';
-
-// UIのレイアウトやスタイルに関する定数
-const UIConstants = {
-  PANEL_WIDTH: 500,
-  PANEL_HEIGHT: 250,
-  RESULT_PANEL_WIDTH: 550,
-  RESULT_PANEL_HEIGHT: 300,
-  CENTER_X: 320,
-  CENTER_Y: 160,
-
-  QUESTION_FONT_SIZE: '16px',
-  CHOICE_FONT_SIZE: '14px',
-  RESULT_FONT_SIZE: '20px',
-  SOURCE_FONT_SIZE: '12px',
-
-  COLOR_WHITE: '#ffffff',
-  COLOR_BLACK: '#000000',
-  COLOR_YELLOW: '#ffff00',
-  COLOR_GREEN: '#00ff00',
-  COLOR_RED: '#ff0000',
-  COLOR_GREY: '#cccccc',
-  COLOR_DARK_GREY: '#666666',
-  BG_COLOR_ALPHA: 0.6,
-  PANEL_BG_ALPHA: 0.8,
-};
+import { UIConstants } from '../ui/UIConstants';
+import Menu from '../ui/components/Menu';
 
 /**
  * クイズシーンのUI要素の作成と更新を担当するクラス
@@ -34,36 +11,34 @@ export default class QuizUI {
   private overlay!: Phaser.GameObjects.Rectangle;
   private questionPanel!: Phaser.GameObjects.Container;
   private resultPanel!: Phaser.GameObjects.Container;
-  private choiceTexts: Phaser.GameObjects.Text[] = [];
+  public menu!: Menu;
 
   constructor(private scene: Phaser.Scene) {
     this.createPanels();
   }
 
   private createPanels(): void {
-    // 半透明黒のオーバーレイ
+    const centerX = this.scene.cameras.main.width / 2;
+    const centerY = this.scene.cameras.main.height / 2;
+
     this.overlay = this.scene.add.rectangle(
-      UIConstants.CENTER_X,
-      UIConstants.CENTER_Y,
-      640,
-      320,
-      0x000000,
-      UIConstants.BG_COLOR_ALPHA
+      centerX,
+      centerY,
+      this.scene.cameras.main.width,
+      this.scene.cameras.main.height,
+      UIConstants.Overlay.BgColor,
+      UIConstants.Overlay.BgAlpha
     );
 
-    // 問題表示用パネル
-    this.questionPanel = this.createPanel(UIConstants.PANEL_WIDTH, UIConstants.PANEL_HEIGHT);
-
-    // 結果表示用パネル
-    this.resultPanel = this.createPanel(UIConstants.RESULT_PANEL_WIDTH, UIConstants.RESULT_PANEL_HEIGHT);
+    this.questionPanel = this.createPanel(centerX, centerY, 500, 250);
+    this.resultPanel = this.createPanel(centerX, centerY, 550, 300);
     this.resultPanel.setVisible(false);
   }
 
-  private createPanel(width: number, height: number): Phaser.GameObjects.Container {
-    const container = this.scene.add.container(UIConstants.CENTER_X, UIConstants.CENTER_Y);
-    const bg = this.scene.add.rectangle(0, 0, width, height, 0x000000, UIConstants.PANEL_BG_ALPHA);
-    const border = this.scene.add.rectangle(0, 0, width, height, 0xffffff, 0);
-    border.setStrokeStyle(4, 0xffffff);
+  private createPanel(x: number, y: number, width: number, height: number): Phaser.GameObjects.Container {
+    const container = this.scene.add.container(x, y);
+    const bg = this.scene.add.rectangle(0, 0, width, height, UIConstants.Panel.BgColor, UIConstants.Panel.BgAlpha);
+    const border = this.scene.add.rectangle(0, 0, width, height, 0, 0).setStrokeStyle(UIConstants.Panel.BorderWidth, UIConstants.Panel.BorderColor);
     container.add([bg, border]);
     return container;
   }
@@ -71,75 +46,57 @@ export default class QuizUI {
   public showQuestion(question: QuizData, onChoiceSelected: (index: number) => void): void {
     this.questionPanel.setVisible(true);
     this.resultPanel.setVisible(false);
-    this.clearPanel(this.questionPanel); // 前の問題をクリア
+    this.clearPanel(this.questionPanel);
 
-    // 問題文
-    const questionText = RetroUI.createSimpleText(this.scene, 0, -60, question.question, {
-      fontSize: UIConstants.QUESTION_FONT_SIZE,
+    const questionText = RetroUI.createSimpleText(this.scene, 0, -80, question.question, {
+      fontSize: UIConstants.FontSize.Normal,
       align: 'center',
-      wordWrap: { width: UIConstants.PANEL_WIDTH - 20, useAdvancedWrap: true }
+      wordWrap: { width: 480, useAdvancedWrap: true }
     }).setOrigin(0.5);
     this.questionPanel.add(questionText);
 
-    // 選択肢
-    this.choiceTexts = [];
-    question.choices.forEach((choice, index) => {
-      const choiceText = RetroUI.createSimpleText(this.scene, 0, -20 + index * 30, `${index + 1}. ${choice}`, {
-        fontSize: UIConstants.CHOICE_FONT_SIZE,
-      }).setOrigin(0.5)
-        .setInteractive({ useHandCursor: true })
-        .on('pointerdown', () => onChoiceSelected(index));
-
-      this.choiceTexts.push(choiceText);
-      this.questionPanel.add(choiceText);
+    // Menuコンポーネントを使って選択肢を作成
+    this.menu = new Menu(this.scene, {
+      x: this.questionPanel.x,
+      y: this.questionPanel.y,
+      options: question.choices.map((choice, index) => `${index + 1}. ${choice}`),
+      fontSize: UIConstants.FontSize.Normal,
+      startY: -10, // パネル中心からの固定オフセット
+      spacing: 30,
     });
-  }
-
-  public updateSelection(selectedIndex: number, choices: string[]): void {
-    this.choiceTexts.forEach((text, index) => {
-      if (!text.scene || !text.active) return;
-      const isSelected = index === selectedIndex;
-      text.setText(`${isSelected ? '▶ ' : ''}${index + 1}. ${choices[index]}`);
-      text.setStyle({
-        backgroundColor: isSelected ? UIConstants.COLOR_YELLOW : 'transparent',
-        color: isSelected ? UIConstants.COLOR_BLACK : UIConstants.COLOR_WHITE
-      });
-    });
+    this.menu.on('selected', onChoiceSelected);
   }
 
   public showResult(isCorrect: boolean, userAnswer: string, correctAnswer: string, source?: QuizData['source_metadata'], sourceChunk?: string): void {
+    if (this.menu) this.menu.destroy();
     this.questionPanel.setVisible(false);
     this.resultPanel.setVisible(true);
     this.clearPanel(this.resultPanel);
 
     const resultMessage = isCorrect ? '正解！' : '不正解…';
-    const resultColor = isCorrect ? UIConstants.COLOR_GREEN : UIConstants.COLOR_RED;
+    const resultColor = isCorrect ? UIConstants.Color.Green : UIConstants.Color.Red;
 
-    // 正解/不正解
     const resultText = RetroUI.createSimpleText(this.scene, 0, -100, resultMessage, {
-      fontSize: UIConstants.RESULT_FONT_SIZE,
+      fontSize: UIConstants.FontSize.Large,
       color: resultColor,
       fontStyle: 'bold'
     }).setOrigin(0.5);
     this.resultPanel.add(resultText);
 
-    // 回答
     const choiceInfo = `選択：${userAnswer}\n正解：${correctAnswer}`;
     const choiceText = RetroUI.createSimpleText(this.scene, 0, -50, choiceInfo, {
-      fontSize: UIConstants.CHOICE_FONT_SIZE,
+      fontSize: UIConstants.FontSize.Small,
       align: 'center'
     }).setOrigin(0.5);
     this.resultPanel.add(choiceText);
 
-    // 出典
     if (source || sourceChunk) {
       this.showSourceInfo(source, sourceChunk);
     }
 
-    // 操作説明
     const instructionText = RetroUI.createSimpleText(this.scene, 0, 130, 'Enter / Space / Esc キーで閉じる', {
-      fontSize: UIConstants.SOURCE_FONT_SIZE,
-      color: UIConstants.COLOR_GREY
+      fontSize: UIConstants.FontSize.Small,
+      color: UIConstants.Color.Grey
     }).setOrigin(0.5);
     this.resultPanel.add(instructionText);
   }
@@ -159,14 +116,14 @@ export default class QuizUI {
     }
 
     const sourceText = RetroUI.createSimpleText(this.scene, 0, -25, sourceInfo, {
-      fontSize: UIConstants.SOURCE_FONT_SIZE
+      fontSize: UIConstants.FontSize.Small
     }).setOrigin(0.5);
     this.resultPanel.add(sourceText);
 
     // 区切り線
     const separator = RetroUI.createSimpleText(this.scene, 0, -10, '─'.repeat(40), {
       fontSize: '10px',
-      color: UIConstants.COLOR_DARK_GREY
+      color: UIConstants.Color.DarkGrey
     }).setOrigin(0.5);
     this.resultPanel.add(separator);
 
@@ -175,7 +132,7 @@ export default class QuizUI {
   }
 
   private createScrollableText(chunk: string): void {
-    const scrollAreaWidth = UIConstants.RESULT_PANEL_WIDTH - 20;
+    const scrollAreaWidth = 530;
     const scrollAreaHeight = 100;
     const scrollAreaYOffset = 50;
 
@@ -190,9 +147,9 @@ export default class QuizUI {
       -scrollAreaHeight / 2 + 5,
       chunk,
       {
-        fontSize: UIConstants.SOURCE_FONT_SIZE,
-        fontFamily: 'DotGothic16, sans-serif',
-        color: UIConstants.COLOR_GREY,
+        fontSize: UIConstants.FontSize.Small,
+        fontFamily: UIConstants.FontFamily,
+        color: UIConstants.Color.Grey,
         align: 'left',
         wordWrap: { width: scrollAreaWidth - 10, useAdvancedWrap: true },
         lineSpacing: 5
@@ -226,7 +183,6 @@ export default class QuizUI {
   }
 
   private clearPanel(panel: Phaser.GameObjects.Container): void {
-    // パネルの子要素を削除（背景とボーダーは除く）
     const childrenToRemove = panel.list.slice(2);
     panel.remove(childrenToRemove, true);
   }
@@ -235,5 +191,6 @@ export default class QuizUI {
     this.overlay.destroy();
     this.questionPanel.destroy();
     this.resultPanel.destroy();
+    if (this.menu) this.menu.destroy();
   }
 }
