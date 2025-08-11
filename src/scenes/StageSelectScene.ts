@@ -34,12 +34,13 @@ export default class StageSelectScene extends Phaser.Scene {
 
     RetroUI.createTitle(panel.scene, panel, 'ステージセレクト', -60);
 
+    // メニュー作成
     this.menu = new Menu(this, {
-      x: panel.x,
-      y: panel.y,
+      x: panel.x,                   // X座標
+      y: panel.y,                   // Y座標
       options: this.stages.map(s => s.name),
-      fontSize: UIConstants.FontSize.Large,
-      startY: 0,
+      fontSize: UIConstants.FontSize.Large, // フォントサイズ
+      startY: 0,                    // 開始Y座標（コンテナ中心からのオフセット）
     });
 
     this.menu.on('selected', (index: number) => {
@@ -47,15 +48,14 @@ export default class StageSelectScene extends Phaser.Scene {
     });
 
     // 操作説明
-    const instructions = [
-      '↑/↓: 移動',
-      '1: 直接選択',
-      'Enter: 決定',
-      'Esc: タイトルに戻る'
-    ];
-    instructions.forEach((text, index) => {
-      RetroUI.createInstructionText(panel.scene, panel, text, 40 + index * 20);
-    });
+    const instructionText = '↑/↓: 移動\n1: 直接選択\nEnter: 決定\nEsc: タイトルに戻る';
+    RetroUI.createInstructionText(
+      panel.scene,
+      panel,
+      instructionText,
+      70, // Y座標
+      { lineSpacing: 8 } // 行間を個別に調整
+    );
 
     // ショートカットキー設定
     this.escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);

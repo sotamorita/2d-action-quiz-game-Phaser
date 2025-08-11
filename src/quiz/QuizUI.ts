@@ -57,12 +57,12 @@ export default class QuizUI {
 
     // Menuコンポーネントを使って選択肢を作成
     this.menu = new Menu(this.scene, {
-      x: this.questionPanel.x,
-      y: this.questionPanel.y,
+      x: this.questionPanel.x,      // X座標
+      y: this.questionPanel.y,      // Y座標
       options: question.choices.map((choice, index) => `${index + 1}. ${choice}`),
-      fontSize: UIConstants.FontSize.Normal,
-      startY: -10, // パネル中心からの固定オフセット
-      spacing: 30,
+      fontSize: UIConstants.FontSize.Normal, // フォントサイズ
+      startY: -10,                  // 開始Y座標（コンテナ中心からのオフセット）
+      spacing: 30,                  // 各項目の間隔
     });
     this.menu.on('selected', onChoiceSelected);
   }
@@ -123,7 +123,7 @@ export default class QuizUI {
     // 区切り線
     const separator = RetroUI.createSimpleText(this.scene, 0, -10, '─'.repeat(40), {
       fontSize: '10px',
-      fontFamily: UIConstants.FontFamily.Main, // 12px未満のため通常フォント
+      fontFamily: UIConstants.FontFamily, // 12px未満のため通常フォント
       color: UIConstants.Color.DarkGrey
     }).setOrigin(0.5);
     this.resultPanel.add(separator);

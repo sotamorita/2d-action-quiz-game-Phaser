@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
 import { UIConstants } from '../UIConstants';
 
+/**
+ * メニューの設定オブジェクトのインターフェース
+ */
 export interface MenuConfig {
   x: number;
   y: number;
@@ -13,8 +16,9 @@ export interface MenuConfig {
 }
 
 /**
- * 選択可能なメニューUIコンポーネント
- * 状態管理と入力処理をカプセル化する
+ * キーボードで操作可能なメニューUIコンポーネント。
+ * 選択状態の管理、入力処理、ハイライト表示などをすべてカプセル化する。
+ * @extends Phaser.GameObjects.Container
  */
 export default class Menu extends Phaser.GameObjects.Container {
   private selectedIndex = 0;
@@ -24,6 +28,18 @@ export default class Menu extends Phaser.GameObjects.Container {
   private options: string[];
   private config: Required<Omit<MenuConfig, 'x' | 'y'>>;
 
+  /**
+   * @param scene - このメニューを追加するシーン
+   * @param config - メニューの設定オブジェクト
+   * @param config.x - メニューコンテナの中心X座標
+   * @param config.y - メニューコンテナの中心Y座標
+   * @param config.options - 表示する選択肢の文字列配列
+   * @param config.startY - (オプション) コンテナ中心からのメニュー項目の初期Y座標オフセット
+   * @param config.spacing - (オプション) 各メニュー項目の間隔
+   * @param config.fontSize - (オプション) フォントサイズ
+   * @param config.highlightColor - (オプション) 選択時の背景色
+   * @param config.highlightTextColor - (オプション) 選択時の文字色
+   */
   constructor(scene: Phaser.Scene, config: MenuConfig) {
     super(scene, config.x, config.y);
 
@@ -44,6 +60,10 @@ export default class Menu extends Phaser.GameObjects.Container {
     scene.add.existing(this);
   }
 
+  /**
+   * メニュー項目とセレクター、ハイライト用のUI要素を作成する
+   * @private
+   */
   private createMenuItems(): void {
     this.options.forEach((option, index) => {
       const style = {
@@ -72,21 +92,38 @@ export default class Menu extends Phaser.GameObjects.Container {
     this.sendToBack(this.highlightRect);
   }
 
+  /**
+   * キーボード入力（UP, DOWN, ENTER）のハンドラを設定する
+   * @private
+   */
   private setupInputHandlers(): void {
     this.scene.input.keyboard!.on('keydown-UP', this.moveSelection.bind(this, -1));
     this.scene.input.keyboard!.on('keydown-DOWN', this.moveSelection.bind(this, 1));
     this.scene.input.keyboard!.on('keydown-ENTER', this.confirmSelection.bind(this));
   }
 
+  /**
+   * 選択項目を上下に移動させる
+   * @param delta - 移動量 (-1 or 1)
+   * @private
+   */
   private moveSelection(delta: number): void {
     this.selectedIndex = (this.selectedIndex + delta + this.options.length) % this.options.length;
     this.updateSelection();
   }
 
+  /**
+   * 現在選択されている項目を決定し、'selected'イベントを発行する
+   * @private
+   */
   private confirmSelection(): void {
     this.emit('selected', this.selectedIndex, this.options[this.selectedIndex]);
   }
 
+  /**
+   * メニューのハイライト表示を更新する
+   * @private
+   */
   private updateSelection(): void {
     this.menuItems.forEach((item, index) => {
       const isSelected = index === this.selectedIndex;
@@ -97,7 +134,7 @@ export default class Menu extends Phaser.GameObjects.Container {
 
     const selectedItem = this.menuItems[this.selectedIndex];
 
-    // --- レイアウト調整用の定数 ---
+    // --- レイアウト微調整用の定数 ---
     const PADDING_X = 35; // ハイライトの左右の余白
     const PADDING_Y = 5; // ハイライトの上下の余白
     const SELECTOR_MARGIN = 15; // セレクター(▶)とテキストの間のスペース
@@ -115,7 +152,9 @@ export default class Menu extends Phaser.GameObjects.Container {
     this.selector.setColor(this.config.highlightTextColor);
   }
 
-  // シーン終了時にキーボードイベントをクリーンアップする
+  /**
+   * シーン終了時にキーボードイベントをクリーンアップする
+   */
   public destroy(fromScene?: boolean): void {
     if (this.scene && this.scene.input && this.scene.input.keyboard) {
       this.scene.input.keyboard.off('keydown-UP', this.moveSelection);

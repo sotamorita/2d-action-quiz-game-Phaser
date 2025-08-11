@@ -1,9 +1,19 @@
 import Phaser from 'phaser';
 import { UIConstants } from './UIConstants';
 
+/**
+ * ゲーム全体で共通して使用されるUI部品を作成するためのユーティリティクラス
+ * 静的メソッドのみで構成される
+ */
 export class RetroUI {
   /**
-   * レトロ風パネルを作成（半透明黒オーバーレイ + 中央パネル（太枠・直角））
+   * 半透明のオーバーレイと中央パネルを持つ、基本的なUIパネルを作成します。
+   * @param scene - 対象のシーン
+   * @param x - パネルの中心X座標
+   * @param y - パネルの中心Y座標
+   * @param width - パネルの幅
+   * @param height - パネルの高さ
+   * @returns 作成されたオーバーレイとパネルのオブジェクト
    */
   static createPanel(
     scene: Phaser.Scene,
@@ -36,52 +46,71 @@ export class RetroUI {
   }
 
   /**
-   * タイトルテキストを作成
+   * タイトル用の大きなテキストを作成します。
+   * @param scene - 対象のシーン
+   * @param container - テキストを追加するコンテナ
+   * @param text - 表示するテキスト
+   * @param y - コンテナ内のY座標
+   * @param style - デフォルトのスタイルを上書きするスタイルオブジェクト (例: { color: '#ff0000', fontSize: '40px' })
+   * @returns 作成されたテキストオブジェクト
    */
   static createTitle(
     scene: Phaser.Scene,
     container: Phaser.GameObjects.Container,
     text: string,
-    y: number = -100
+    y: number = -100,
+    style?: Phaser.Types.GameObjects.Text.TextStyle
   ): Phaser.GameObjects.Text {
-    const titleText = scene.add.text(0, y, text, {
+    const defaultStyle: Phaser.Types.GameObjects.Text.TextStyle = {
       fontSize: UIConstants.FontSize.Title,
       fontFamily: UIConstants.FontFamily,
-      color: UIConstants.Color.White
-    }).setOrigin(0.5);
+      color: UIConstants.Color.White,
+    };
+    const mergedStyle = { ...defaultStyle, ...style };
+    const titleText = scene.add.text(0, y, text, mergedStyle).setOrigin(0.5);
 
     container.add(titleText);
     return titleText;
   }
 
   /**
-   * 説明テキストを作成
+   * 説明文用の小さなテキストを作成します。
+   * @param scene - 対象のシーン
+   * @param container - テキストを追加するコンテナ
+   * @param text - 表示するテキスト
+   * @param y - コンテナ内のY座標
+   * @param style - デフォルトのスタイルを上書きするスタイルオブジェクト (例: { lineSpacing: 10 })
+   * @returns 作成されたテキストオブジェクト
    */
   static createInstructionText(
     scene: Phaser.Scene,
     container: Phaser.GameObjects.Container,
     text: string,
     y: number = 100,
-    wordWrapWidth?: number
+    style?: Phaser.Types.GameObjects.Text.TextStyle
   ): Phaser.GameObjects.Text {
-    const style: Phaser.Types.GameObjects.Text.TextStyle = {
+    const defaultStyle: Phaser.Types.GameObjects.Text.TextStyle = {
       fontSize: UIConstants.FontSize.Small,
       fontFamily: UIConstants.FontFamily,
       color: UIConstants.Color.Grey,
-      align: 'center'
+      align: 'center',
+      lineSpacing: UIConstants.Text.LineSpacing,
     };
+    const mergedStyle = { ...defaultStyle, ...style };
+    const instructionText = scene.add.text(0, y, text, mergedStyle).setOrigin(0.5);
 
-    if (wordWrapWidth) {
-      style.wordWrap = { width: wordWrapWidth, useAdvancedWrap: true };
-    }
-
-    const instructionText = scene.add.text(0, y, text, style).setOrigin(0.5);
     container.add(instructionText);
     return instructionText;
   }
 
   /**
-   * 汎用的なテキストを作成（DotGothic16フォントをデフォルトで適用）
+   * 汎用的なテキストを作成します。
+   * @param scene - 対象のシーン
+   * @param x - X座標
+   * @param y - Y座標
+   * @param text - 表示するテキスト
+   * @param style - デフォルトのスタイルを上書きするスタイルオブジェクト
+   * @returns 作成されたテキストオブジェクト
    */
   static createSimpleText(
     scene: Phaser.Scene,
@@ -94,7 +123,7 @@ export class RetroUI {
       fontFamily: UIConstants.FontFamily,
       color: UIConstants.Color.White,
       fontSize: UIConstants.FontSize.Normal,
-      lineSpacing: 5
+      lineSpacing: UIConstants.Text.LineSpacing
     };
     const mergedStyle = { ...defaultStyle, ...style };
 

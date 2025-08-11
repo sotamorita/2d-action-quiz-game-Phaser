@@ -30,18 +30,24 @@ export default class QuizCategorySelectScene extends Phaser.Scene {
     RetroUI.createTitle(panel.scene, panel, 'クイズ選択', -60);
 
     this.menu = new Menu(this, {
-      x: panel.x,
-      y: panel.y,
+      x: panel.x,                   // X座標
+      y: panel.y,                   // Y座標
       options: this.quizCategories.map(c => c.name),
-      fontSize: UIConstants.FontSize.Large,
-      startY: 0,
+      fontSize: UIConstants.FontSize.Large, // フォントサイズ
+      startY: 0,                    // 開始Y座標（コンテナ中心からのオフセット）
     });
 
     this.menu.on('selected', (index: number) => {
       this.selectCategory(index);
     });
 
-    RetroUI.createInstructionText(panel.scene, panel, 'Enter: 決定  Esc: タイトルに戻る', 100);
+    RetroUI.createInstructionText(
+      panel.scene,
+      panel,
+      'Enter: 決定  Esc: タイトルに戻る',
+      100, // Y座標
+      { lineSpacing: 10 } // 行間を個別に調整
+    );
 
     this.escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     this.escKey.on('down', () => this.scene.start('TitleScene'));

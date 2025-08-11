@@ -52,14 +52,13 @@ export default class TitleScene extends Phaser.Scene {
 
     // メニュー作成
     this.menu = new Menu(this, {
-      x: centerX,
-      y: centerY + 40,
+      x: centerX,                   // X座標
+      y: centerY + 40,              // Y座標
       options: ['ゲームスタート', 'クイズ選択'],
-      fontSize: UIConstants.FontSize.Large,
-      startY: 0,
-      spacing: 50,
-      highlightColor: UIConstants.Color.White,
-      highlightTextColor: UIConstants.Color.Black,
+      fontSize: UIConstants.FontSize.Large, // フォントサイズ
+      startY: 0,                    // 開始Y座標（コンテナ中心からのオフセット）
+      highlightColor: UIConstants.Color.White, // 選択時の背景色
+      highlightTextColor: UIConstants.Color.Black, // 選択時の文字色
     });
 
     // メニュー選択時のイベントリスナー

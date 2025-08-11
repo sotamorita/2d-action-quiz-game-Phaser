@@ -51,12 +51,12 @@ export default class ClearScene extends Phaser.Scene {
 
     // メニュー作成
     this.menu = new Menu(this, {
-      x: panel.x,
-      y: panel.y,
+      x: panel.x,                   // X座標
+      y: panel.y,                   // Y座標
       options: ['再挑戦', 'タイトルへ戻る'],
-      fontSize: UIConstants.FontSize.Large,
-      startY: 20,
-      spacing: 35,
+      fontSize: UIConstants.FontSize.Large, // フォントサイズ
+      startY: 20,                   // 開始Y座標（コンテナ中心からのオフセット）
+      spacing: 35,                  // 各項目の間隔
     });
 
     // メニュー選択時のイベントリスナー
@@ -76,8 +76,11 @@ export default class ClearScene extends Phaser.Scene {
       panel.scene,
       panel,
       '↑/↓: 選択  Enter: 決定\nR: 再挑戦  T: タイトル',
-      80,
-      380
+      95, // Y座標
+      {
+        wordWrap: { width: 380 }, // 折り返し幅
+        lineSpacing: 7.5,          // 行間
+      }
     );
 
     // クリーンアップ設定

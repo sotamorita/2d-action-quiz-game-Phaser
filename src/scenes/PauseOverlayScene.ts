@@ -36,12 +36,12 @@ export default class PauseOverlayScene extends Phaser.Scene {
 
     // メニュー作成
     this.menu = new Menu(this, {
-      x: panel.x,
-      y: panel.y,
+      x: panel.x,                   // X座標
+      y: panel.y,                   // Y座標
       options: ['コンティニュー', 'リトライ', 'タイトルへ戻る'],
-      fontSize: UIConstants.FontSize.Large,
-      startY: -20,
-      spacing: 35,
+      fontSize: UIConstants.FontSize.Large, // フォントサイズ
+      startY: -20,                  // 開始Y座標（コンテナ中心からのオフセット）
+      spacing: 35,                  // 各項目の間隔
     });
 
     // メニュー選択時のイベントリスナー
@@ -59,8 +59,14 @@ export default class PauseOverlayScene extends Phaser.Scene {
     this.tKey.on('down', () => this.executeAction(2));
 
     // 操作説明
-    RetroUI.createInstructionText(panel.scene, panel, '↑/↓: 選択  Enter: 決定', 80);
-    RetroUI.createInstructionText(panel.scene, panel, 'ESC: コンティニュー  R: リトライ  T: タイトル', 100);
+    const instructionText = '↑/↓: 選択  Enter: 決定\nESC: コンティニュー  R: リトライ  T: タイトル';
+    RetroUI.createInstructionText(
+      panel.scene,
+      panel,
+      instructionText,
+      90, // Y座標
+      { lineSpacing: 10 } // 行間を個別に調整
+    );
 
     // クリーンアップ設定
     this.events.once('shutdown', this.cleanup, this);
