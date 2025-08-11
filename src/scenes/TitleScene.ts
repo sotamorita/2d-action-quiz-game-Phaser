@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import { RetroUI } from '../ui/RetroUI';
 import Menu from '../ui/components/Menu';
 import { UIConstants } from '../ui/UIConstants';
 
@@ -18,37 +17,50 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   create() {
-    // 背景画像を追加
-    this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'background');
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
 
-    // レトロ風UIパネル作成
-    const { panel } = RetroUI.createPanel(this, this.cameras.main.width / 2, this.cameras.main.height / 2, 400, 250);
+    // 背景画像を追加
+    this.add.image(centerX, centerY, 'background');
 
     // タイトルテキスト
-    RetroUI.createTitle(panel.scene, panel, 'レトロ・クイズ・アクション', -60);
+    this.add.text(centerX, centerY - 80, '2Dアクション・クイズゲーム', {
+      fontFamily: UIConstants.FontFamily,
+      fontSize: '38px',
+      color: UIConstants.Color.White,
+      stroke: UIConstants.Color.Black,
+      strokeThickness: 8,
+      shadow: {
+        offsetX: 5,
+        offsetY: 5,
+        color: '#000',
+        blur: 5,
+        stroke: true,
+        fill: true
+      }
+    }).setOrigin(0.5);
 
     // メニュー作成
     this.menu = new Menu(this, {
-      x: panel.x,
-      y: panel.y,
-      options: ['ゲームスタート'],
+      x: centerX,
+      y: centerY + 40,
+      options: ['ゲームスタート', 'クイズ選択'],
       fontSize: UIConstants.FontSize.Large,
       startY: 0,
+      spacing: 50,
+      highlightColor: UIConstants.Color.White,
+      highlightTextColor: UIConstants.Color.Black,
     });
 
     // メニュー選択時のイベントリスナー
     this.menu.on('selected', (index: number) => {
       if (index === 0) {
+        // ステージセレクトへ
         this.scene.start('StageSelectScene');
+      } else if (index === 1) {
+        // クイズ選択シーンへ
+        this.scene.start('QuizOnlyScene');
       }
     });
-
-    // 操作説明
-    RetroUI.createInstructionText(
-      panel.scene,
-      panel,
-      '↑/↓: 選択  Enter: 決定',
-      40
-    );
   }
 }

@@ -8,7 +8,8 @@ export interface MenuConfig {
   startY?: number;
   spacing?: number;
   fontSize?: string;
-  // 今後、パネルの有無などを設定できるように拡張可能
+  highlightColor?: string;
+  highlightTextColor?: string;
 }
 
 /**
@@ -30,6 +31,8 @@ export default class Menu extends Phaser.GameObjects.Container {
       startY: config.startY ?? -50,
       spacing: config.spacing ?? 40,
       fontSize: config.fontSize ?? UIConstants.FontSize.Large,
+      highlightColor: config.highlightColor ?? UIConstants.Color.Yellow,
+      highlightTextColor: config.highlightTextColor ?? UIConstants.Color.Black,
     };
 
     this.createMenuItems();
@@ -73,8 +76,8 @@ export default class Menu extends Phaser.GameObjects.Container {
       const isSelected = index === this.selectedIndex;
       item.setText(`${isSelected ? '▶ ' : ''}${this.options[index]}`);
       item.setStyle({
-        backgroundColor: isSelected ? UIConstants.Color.Yellow : 'transparent',
-        color: isSelected ? UIConstants.Color.Black : UIConstants.Color.White,
+        backgroundColor: isSelected ? this.config.highlightColor : 'transparent',
+        color: isSelected ? this.config.highlightTextColor : UIConstants.Color.White,
         padding: { x: 10, y: 5 }
       });
     });
