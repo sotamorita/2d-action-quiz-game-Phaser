@@ -246,7 +246,7 @@ export default class GameScene extends Phaser.Scene {
     }).setScrollFactor(0);
 
     // 操作説明の追加
-    RetroUI.createSimpleText(this, 16, 305, '基本操作: [矢印キー/WASD] 移動 / ゲーム: [S]セーブ [L]ロード [R]リセット [Q]タイトル', { // 操作説明を1行にまとめ、Y座標を調整
+    RetroUI.createSimpleText(this, 16, 305, '[矢印キー] 移動  [Space] ジャンプ  [Esc] ポーズ', {
       fontSize: '12px' // フォントサイズを12pxに拡大
     }).setScrollFactor(0);
 
