@@ -27,6 +27,7 @@ export default class QuizScene extends Phaser.Scene {
 
   // 呼び出し元シーンの情報
   private returnSceneKey!: string;
+  private category?: string;
 
   constructor() {
     super({ key: 'QuizScene' });
@@ -34,6 +35,7 @@ export default class QuizScene extends Phaser.Scene {
 
   init(data: { category?: string; returnSceneKey: string }) {
     this.returnSceneKey = data.returnSceneKey;
+    this.category = data.category;
 
     // ヘルパークラスのインスタンス化
     this.dataManager = new QuizDataManager(this);
@@ -44,20 +46,19 @@ export default class QuizScene extends Phaser.Scene {
     this.selectedIndex = 0;
     this.isCorrect = false;
     this.currentQuestion = undefined;
-
-    // データの読み込み
-    if (!this.dataManager.load('quiz_db', data.category)) {
-      this.safeExit(); // データ読み込み失敗時は安全に終了
-    }
   }
 
   preload() {
-    // データはinitで読み込み済みなので、preloadでは何もしない
-    // ただし、将来的に画像などを追加する場合はここに記述
     this.load.json('quiz_db', 'assets/quiz/quiz_db.json');
   }
 
   create() {
+    // preload完了後にデータをロード
+    if (!this.dataManager.load('quiz_db', this.category)) {
+      this.safeExit();
+      return;
+    }
+
     this.input.keyboard!.enabled = true;
     this.transitionToState(QuizState.QUESTION);
     this.events.once('shutdown', this.cleanup, this);
