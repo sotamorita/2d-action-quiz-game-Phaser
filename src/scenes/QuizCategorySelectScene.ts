@@ -24,6 +24,7 @@ import { CommonBackground } from '../ui/views/CommonBackground';
  */
 export default class QuizCategorySelectScene extends Phaser.Scene {
   private menu!: Menu;
+  private commonBackground!: CommonBackground;
   private escKey?: Phaser.Input.Keyboard.Key;
   // 将来的にquiz_db.jsonから動的にカテゴリを取得することを想定したデータ構造
   private quizCategories = [{ id: 'general', name: 'すべての問題' }];
@@ -50,7 +51,8 @@ export default class QuizCategorySelectScene extends Phaser.Scene {
     const centerY = this.cameras.main.height / 2;
 
     // 共通の背景を描画
-    CommonBackground.drawGameBackground(this);
+    this.commonBackground = new CommonBackground(this);
+    this.commonBackground.create(true); // 地面も描画
 
     // UIユーティリティを使って、中央に表示されるパネルを作成
     const { panel } = RetroUI.createPanel(this, centerX, centerY, 400, 250);

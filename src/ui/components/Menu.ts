@@ -16,6 +16,8 @@ export interface MenuConfig {
   fontSize?: string;
   highlightColor?: string;
   highlightTextColor?: string;
+  // 特定のインデックスのアイテムに適用するカスタムスタイル
+  overrideStyles?: { [index: number]: Partial<Phaser.Types.GameObjects.Text.TextStyle> };
 }
 
 /**
@@ -45,7 +47,7 @@ export default class Menu extends Phaser.GameObjects.Container {
   private selector!: Phaser.GameObjects.Text;
   private highlightRect!: Phaser.GameObjects.Rectangle;
   private options: string[];
-  private config: Required<Omit<MenuConfig, 'x' | 'y'>>;
+  private config: Required<Omit<MenuConfig, 'x' | 'y' | 'overrideStyles'>> & Pick<MenuConfig, 'overrideStyles'>;
 
   /**
    * Menuクラスのインスタンスを生成します。
@@ -63,6 +65,7 @@ export default class Menu extends Phaser.GameObjects.Container {
       fontSize: config.fontSize ?? UIConstants.FontSize.Large,
       highlightColor: config.highlightColor ?? UIConstants.Color.Yellow,
       highlightTextColor: config.highlightTextColor ?? UIConstants.Color.Black,
+      overrideStyles: config.overrideStyles,
     };
 
     this.createMenuItems();
@@ -79,13 +82,22 @@ export default class Menu extends Phaser.GameObjects.Container {
    */
   private createMenuItems(): void {
     this.options.forEach((option, index) => {
-      const style = {
+      // 基本スタイルを定義
+      const baseStyle: Phaser.Types.GameObjects.Text.TextStyle = {
         fontSize: this.config.fontSize,
         fontFamily: UIConstants.FontFamily,
         color: UIConstants.Color.White,
       };
+
+      // 特定のインデックスに対する上書きスタイルを取得
+      const overrideStyle = this.config.overrideStyles?.[index] ?? {};
+
+      // 基本スタイルと上書きスタイルをマージ
+      const finalStyle = { ...baseStyle, ...overrideStyle };
+
       const y = this.config.startY + (index * this.config.spacing);
-      const menuItem = this.scene.add.text(0, y, option, style).setOrigin(0.5);
+      const menuItem = this.scene.add.text(0, y, option, finalStyle)
+        .setOrigin(0.5);
       this.add(menuItem);
       this.menuItems.push(menuItem);
     });

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Menu from '../ui/components/Menu';
 import { UIConstants } from '../ui/styles/UIConstants';
+import { CommonBackground } from '../ui/views/CommonBackground';
 
 /**
  * @class TitleScene
@@ -20,6 +21,7 @@ import { UIConstants } from '../ui/styles/UIConstants';
  */
 export default class TitleScene extends Phaser.Scene {
   private menu!: Menu; // メニューコンポーネント
+  private commonBackground!: CommonBackground;
 
   constructor() {
     super('TitleScene');
@@ -36,8 +38,9 @@ export default class TitleScene extends Phaser.Scene {
     const centerX = this.cameras.main.width / 2;
     const centerY = this.cameras.main.height / 2;
 
-    // 背景画像を追加
-    this.add.image(centerX, centerY, 'background');
+    // 共通背景を作成
+    this.commonBackground = new CommonBackground(this);
+    this.commonBackground.create();
 
     // 背景の上に半透明の黒いオーバーレイを重ねて、テキストを読みやすくする
     this.add.rectangle(
@@ -50,13 +53,11 @@ export default class TitleScene extends Phaser.Scene {
     );
 
     // タイトルテキストを作成
-    const titleText = this.add.text(centerX, centerY - 80, '2Dアクション・クイズゲーム', {
+    const titleText = this.add.text(centerX, centerY - 50, '2Dアクション・クイズゲーム', {
       fontFamily: UIConstants.FontFamily,
       fontSize: '38px',
       color: UIConstants.Color.White,
-      stroke: UIConstants.Color.Black, // 文字の縁取り
-      strokeThickness: 8
-    }).setOrigin(0.5); // テキストの中心を基準に配置
+    }).setOrigin(0.5).setShadow(3, 3, UIConstants.Color.Black, 3); // テキストの中心を基準に配置
 
     // タイトルテキストをゆっくり上下に動かすTweenアニメーション
     this.tweens.add({
@@ -73,10 +74,18 @@ export default class TitleScene extends Phaser.Scene {
       x: centerX,
       y: centerY + 40,
       options: ['ゲームスタート', 'クイズ選択'],
-      fontSize: UIConstants.FontSize.Large,
       startY: 0,
-      highlightColor: UIConstants.Color.White,
+      highlightColor: UIConstants.Color.Green,
       highlightTextColor: UIConstants.Color.Black,
+      // タイトルシーンのメニュー項目にのみ適用する特別なスタイル
+      overrideStyles: {
+        0: { // 「ゲームスタート」
+          fontSize: '24px', // 少し大きく
+        },
+        1: { // 「クイズ選択」
+          fontSize: '24px', // 少し大きく
+        }
+      }
     });
 
     // メニュー項目が選択されたときのイベントリスナー
@@ -89,5 +98,13 @@ export default class TitleScene extends Phaser.Scene {
         this.scene.start('QuizCategorySelectScene');
       }
     });
+  }
+
+  /**
+   * シーンの更新処理。毎フレーム呼び出されます。
+   * 背景をスクロールさせます。
+   */
+  update() {
+    this.commonBackground.update();
   }
 }
