@@ -4,8 +4,8 @@
 
 **ゲームをプレイする:** <a href="https://sotamorita.github.io/2d-action-quiz-game-Phaser" target="_blank" rel="noopener noreferrer">https://sotamorita.github.io/2d-action-quiz-game-Phaser</a>
 
-<a href="https://youtu.be/O_Xy8FTkWTs" target="_blank" rel="noopener noreferrer">
-  <img src="https://img.youtube.com/vi/O_Xy8FTkWTs/0.jpg" alt="プレイ動画">
+<a href="https://youtu.be/9QdC3_EfqvI" target="_blank" rel="noopener noreferrer">
+  <img src="https://img.youtube.com/vi/9QdC3_EfqvI/0.jpg" alt="プレイ動画">
 </a>
 
 ## 概要
