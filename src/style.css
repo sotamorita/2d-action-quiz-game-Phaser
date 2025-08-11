@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
-
 /* リセットとベース設定 */
 * {
   margin: 0;
@@ -18,6 +16,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  /* font-family はPhaser側で指定するため削除 */
 }
 
 /* ゲームコンテナ - Phaserに任せる */

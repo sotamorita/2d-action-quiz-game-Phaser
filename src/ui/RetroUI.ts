@@ -97,6 +97,12 @@ export class RetroUI {
       lineSpacing: 5
     };
     const mergedStyle = { ...defaultStyle, ...style };
+
+    // 12px未満のフォントはデフォルトのsans-serifを使用
+    if (mergedStyle.fontSize && parseInt(String(mergedStyle.fontSize)) < 12) {
+      delete mergedStyle.fontFamily;
+    }
+
     return scene.add.text(x, y, text, mergedStyle);
   }
 }

@@ -123,6 +123,7 @@ export default class QuizUI {
     // 区切り線
     const separator = RetroUI.createSimpleText(this.scene, 0, -10, '─'.repeat(40), {
       fontSize: '10px',
+      fontFamily: UIConstants.FontFamily.Main, // 12px未満のため通常フォント
       color: UIConstants.Color.DarkGrey
     }).setOrigin(0.5);
     this.resultPanel.add(separator);

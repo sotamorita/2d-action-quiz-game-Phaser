@@ -1,6 +1,6 @@
 export const UIConstants = {
   // Fonts
-  FontFamily: 'DotGothic16, sans-serif',
+  FontFamily: '"DotGothic16", sans-serif',
 
   // Colors
   Color: {
