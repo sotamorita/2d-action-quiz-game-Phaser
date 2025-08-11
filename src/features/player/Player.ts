@@ -14,9 +14,11 @@ const INVINCIBILITY_DURATION = 3000;
 const BLINK_DURATION = 100;
 
 // プレイヤーの基本性能をコードで定義
-const PLAYER_SPEED = 200;
+const PLAYER_SPEED = 220;
 const PLAYER_JUMP_FORCE = 360;
-const PLAYER_MAX_HEALTH = 1;
+const PLAYER_MAX_HEALTH = 2;
+const PLAYER_INITIAL_HEALTH = 1;
+const PLAYER_DRAG = 2000;
 
 const ANIMATIONS = {
   LEFT: 'left',
@@ -32,6 +34,7 @@ export default class Player extends BaseObject {
 
   public state = PlayerState.NORMAL;
   private invincibleTimer?: Phaser.Time.TimerEvent;
+  private lastDirection: 'left' | 'right' = 'right';
 
   constructor(
     scene: Phaser.Scene,
@@ -46,12 +49,15 @@ export default class Player extends BaseObject {
     body.setGravityY(PLAYER_GRAVITY);
     this.setBounce(PLAYER_BOUNCE);
     this.setCollideWorldBounds(true);
+    if (this.body) {
+      (this.body as Phaser.Physics.Arcade.Body).setDragX(PLAYER_DRAG);
+    }
 
     // 基本性能を適用
     this.speed = PLAYER_SPEED;
     this.jumpForce = PLAYER_JUMP_FORCE;
     this.maxHealth = PLAYER_MAX_HEALTH;
-    this.health = this.maxHealth;
+    this.health = PLAYER_INITIAL_HEALTH;
   }
 
   public initialize(): void {
@@ -118,24 +124,53 @@ export default class Player extends BaseObject {
     const body = this.body as Phaser.Physics.Arcade.Body;
     const onGround = body.blocked.down;
 
-    // 横移動
-    if (leftIsDown) {
-      this.setVelocityX(-this.speed);
-      this.anims.play(ANIMATIONS.LEFT, true);
-    } else if (rightIsDown) {
-      this.setVelocityX(this.speed);
-      this.anims.play(ANIMATIONS.RIGHT, true);
-    } else {
-      // 地上にいる時のみ停止
-      if (onGround) {
-        this.setVelocityX(0);
+    // --- 物理挙動の制御 ---
+    if (onGround) {
+      body.setDragX(PLAYER_DRAG);
+      if (leftIsDown) {
+        this.setVelocityX(-this.speed);
+        this.lastDirection = 'left';
+      } else if (rightIsDown) {
+        this.setVelocityX(this.speed);
+        this.lastDirection = 'right';
       }
-      this.anims.play(ANIMATIONS.TURN);
+      if (jumpIsDown) {
+        this.setVelocityY(-this.jumpForce);
+      }
+    } else {
+      body.setDragX(0);
+      if (leftIsDown) {
+        this.setVelocityX(-this.speed);
+        this.lastDirection = 'left';
+      } else if (rightIsDown) {
+        this.setVelocityX(this.speed);
+        this.lastDirection = 'right';
+      }
     }
 
-    // ジャンプ（地面にいるときのみ）
-    if (jumpIsDown && onGround) {
-      this.setVelocityY(-this.jumpForce);
+    // --- アニメーションの制御 ---
+    this.updateAnimation();
+  }
+
+  private updateAnimation(): void {
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    const onGround = body.blocked.down;
+    let newAnimKey = this.anims.currentAnim?.key;
+
+    if (onGround) {
+      if (Math.abs(body.velocity.x) > 10) {
+        newAnimKey = this.lastDirection;
+      } else {
+        newAnimKey = ANIMATIONS.TURN;
+      }
+    } else {
+      if (this.anims.currentAnim?.key !== ANIMATIONS.TURN) {
+        newAnimKey = this.lastDirection;
+      }
+    }
+
+    if (this.anims.currentAnim?.key !== newAnimKey) {
+      this.anims.play(newAnimKey!, true);
     }
   }
 
