@@ -3,13 +3,35 @@ import { RetroUI } from '../ui/styles/RetroUI';
 import Menu from '../ui/components/Menu';
 import { UIConstants } from '../ui/styles/UIConstants';
 
+/**
+ * @class PauseOverlayScene
+ * @description
+ * ゲームプレイ中（`GameScene`）にポーズした際に、上に重ねて表示されるモーダル的なシーンです。
+ * ゲームの再開、リトライ、タイトルへの復帰といった選択肢をプレイヤーに提供します。
+ *
+ * [設計思想]
+ * - **オーバーレイシーン**: このシーンは他のシーン（主に`GameScene`）を停止させずに、
+ *   その上に重ねて（オーバーレイして）実行されます。`scene.launch()`で起動され、
+ *   `scene.resume()`や`scene.stop()`を使って背後のシーンを制御します。
+ *   これにより、ゲームの状態を保持したまま、モーダルUIを提供できます。
+ * - **コンテキストの引き継ぎ**: `init`メソッドを通じて、呼び出し元のシーンからステージ情報
+ *   （`stageId`, `mapPath`）を受け取ります。これにより、「リトライ」が選択された際に、
+ *   同じステージで`GameScene`を再起動することが可能になります。
+ * - **UIコンポーネントの活用**: 他のメニュー系シーンと同様に、`Menu`コンポーネントと`RetroUI`を
+ *   活用して、一貫性のあるUIを効率的に構築しています。
+ * - **明確なアクション定義**: `executeAction`メソッド内で、メニューの選択肢（インデックス）と
+ *   実行するアクション（コンティニュー、リトライ、タイトルへ）を明確に対応付けています。
+ *   これにより、ロジックが追いやすくなっています。
+ */
 export default class PauseOverlayScene extends Phaser.Scene {
+  // GameSceneから引き継ぐ、現在のステージ情報
   private stageId?: string;
   private mapPath?: string;
+  // ポーズをかけた元のシーンのキー
   private returnScene?: string;
   private menu!: Menu;
 
-  // ショートカットキー
+  // このシーン専用のショートカットキー
   private escKey?: Phaser.Input.Keyboard.Key;
   private rKey?: Phaser.Input.Keyboard.Key;
   private tKey?: Phaser.Input.Keyboard.Key;
@@ -18,12 +40,22 @@ export default class PauseOverlayScene extends Phaser.Scene {
     super('PauseOverlayScene');
   }
 
+  /**
+   * シーンが起動する際に呼び出され、呼び出し元のシーンからデータを受け取ります。
+   * @param data - 呼び出し元シーンから渡されるデータオブジェクト。
+   * @param data.stageId - 現在のステージID。リトライ時に使用。
+   * @param data.mapPath - 現在のマップファイルパス。リトライ時に使用。
+   * @param data.returnScene - ポーズを解除した際に再開するシーンのキー。
+   */
   init(data: { stageId?: string; mapPath?: string; returnScene?: string }) {
     this.stageId = data.stageId;
     this.mapPath = data.mapPath;
     this.returnScene = data.returnScene;
   }
 
+  /**
+   * シーンが開始されたときに一度だけ呼び出され、UI要素の作成とイベントリスナーの設定を行います。
+   */
   create() {
     const centerX = this.cameras.main.width / 2;
     const centerY = this.cameras.main.height / 2;
@@ -72,28 +104,42 @@ export default class PauseOverlayScene extends Phaser.Scene {
     this.events.once('shutdown', this.cleanup, this);
   }
 
+  /**
+   * メニューで選択された項目に応じたアクションを実行します。
+   * @param actionIndex - 選択されたメニュー項目のインデックス。
+   * @private
+   */
   private executeAction(actionIndex: number) {
+    const returnSceneKey = this.returnScene || 'GameScene';
+
     switch (actionIndex) {
-      case 0: // コンティニュー
-        this.scene.resume(this.returnScene || 'GameScene');
-        this.scene.stop();
+      // コンティニュー
+      case 0:
+        this.scene.resume(returnSceneKey);
+        this.scene.stop(); // このポーズシーン自身を停止
         break;
-      case 1: // リトライ
-        this.scene.stop(this.returnScene || 'GameScene');
+      // リトライ
+      case 1:
+        this.scene.stop(returnSceneKey); // 現在のゲームシーンを完全に停止
+        // 新しいゲームシーンを同じステージ情報で開始
         this.scene.start('GameScene', {
           stageId: this.stageId,
           mapPath: this.mapPath
         });
-        this.scene.stop(); // ポーズシーン自身を停止
         break;
-      case 2: // タイトルへ戻る
-        this.scene.stop(this.returnScene || 'GameScene');
+      // タイトルへ戻る
+      case 2:
+        this.scene.stop(returnSceneKey); // 現在のゲームシーンを完全に停止
         this.scene.start('TitleScene');
-        this.scene.stop(); // ポーズシーン自身を停止
         break;
     }
   }
 
+  /**
+   * このシーンで登録したすべてのイベントリスナーを解除します。
+   * シーンがシャットダウンする際に自動的に呼び出され、メモリリークを防ぎます。
+   * @private
+   */
   private cleanup() {
     // ショートカットキーのイベントを解除
     this.escKey?.off('down');

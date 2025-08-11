@@ -1,17 +1,32 @@
 /**
- * UI全体のデザインやレイアウトに関する設定値を集約したオブジェクト
- * ゲーム全体のデザインを一貫させるための基本ルールを定義する
+ * @namespace UIConstants
+ * @description
+ * ゲーム全体のUIに関するデザインシステムを定義する定数オブジェクトです。
+ * 色、フォントサイズ、レイアウトなどの視覚的要素をここで一元管理することにより、
+ * プロジェクト全体で一貫したデザインを容易に維持・変更できるようにします。
+ *
+ * [設計思想]
+ * - **単一情報源 (Single Source of Truth)**: UIに関するすべての「マジックナンバー」やハードコードされた値を
+ *   このファイルに集約します。例えば、ゲームのテーマカラーを変更したい場合、
+ *   このファイルの `Color.Yellow` を変更するだけで、関連するすべてのUIコンポーネントに自動的に反映されます。
+ * - **意味的な命名**: `FontSize.Small` や `Color.Red` のように、値そのものではなく、
+ *   その値が持つ「意味」や「役割」で名前を付けています。これにより、コードを読む際に
+ *   `'12px'` が「小さいフォント」を意図していることが直感的に理解できます。
+ * - **構造化**: `Panel`や`Overlay`のように、関連する定数をオブジェクトでグループ化することで、
+ *   目的の定数を見つけやすくし、コードの可読性を高めています。
  */
 export const UIConstants = {
   /**
-   * フォントファミリー
-   * Main: 通常のテキストに使用
-   * Title: タイトルや見出しに使用
+   * @property {string} FontFamily
+   * @description ゲーム全体で使用する基本のフォントファミリー。
+   * レトロな雰囲気を出すために "DotGothic16" を優先的に使用し、
+   * 利用できない環境では汎用のsans-serifフォントで代替表示（フォールバック）します。
    */
   FontFamily: '"DotGothic16", sans-serif',
 
   /**
-   * 基本色
+   * @property {object} Color
+   * @description UIで使用する色のパレット。プロジェクトのカラースキームを定義します。
    */
   Color: {
     White: '#ffffff',
@@ -24,7 +39,9 @@ export const UIConstants = {
   },
 
   /**
-   * 基本フォントサイズ
+   * @property {object} FontSize
+   * @description UIテキストの階層を定義するフォントサイズ。
+   * Small, Normal, Large, Title の4段階で情報の重要度を示します。
    */
   FontSize: {
     Small: '12px',
@@ -34,7 +51,8 @@ export const UIConstants = {
   },
 
   /**
-   * テキストの共通スタイル
+   * @property {object} Text
+   * @description テキスト要素に共通して適用されるスタイル。
    */
   Text: {
     LineSpacing: 5,
@@ -42,7 +60,9 @@ export const UIConstants = {
   },
 
   /**
-   * パネルの共通スタイル
+   * @property {object} Panel
+   * @description ポップアップウィンドウなどのパネルUIの共通スタイル。
+   * 枠線の色や太さ、背景の透明度などを定義します。
    */
   Panel: {
     BorderColor: 0xffffff,
@@ -52,7 +72,8 @@ export const UIConstants = {
   },
 
   /**
-   * オーバーレイの共通スタイル
+   * @property {object} Overlay
+   * @description パネル表示時に背景を暗くするためのオーバーレイの共通スタイル。
    */
   Overlay: {
     BgColor: 0x000000,
@@ -60,7 +81,9 @@ export const UIConstants = {
   },
 
   /**
-   * 背景画像の基本レイアウト
+   * @property {object} Background
+   * @description ゲームシーンの背景（地面や空など）のレイアウトに関する定数。
+   * 主に `CommonBackground` クラスで参照されます。
    */
   Background: {
     GroundY: 380,

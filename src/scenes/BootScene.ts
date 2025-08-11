@@ -1,12 +1,31 @@
 import Phaser from 'phaser';
 
+/**
+ * @class BootScene
+ * @extends Phaser.Scene
+ * @description
+ * ゲーム起動時に最初に読み込まれるシーン。
+ * このシーンの唯一の役割は、次の`PreloadScene`を開始することです。
+ *
+ * 設計思想:
+ * ゲームの起動プロセスを段階的に分割しています。
+ * - BootScene: ゲームの入り口。基本的な設定や、次のシーンへの橋渡しを行う。
+ * - PreloadScene: アセットの読み込みに専念する。
+ * - TitleScene: ユーザーが最初に目にするゲーム画面。
+ * このように役割を分けることで、各シーンの責務が明確になり、管理しやすくなります。
+ * 例えば、将来的に起動時の設定（スケールモードの変更など）を追加する場合、
+ * この`BootScene`に記述すれば良いため、他のシーンに影響を与えません。
+ */
 export default class BootScene extends Phaser.Scene {
   constructor() {
     super('BootScene');
   }
 
+  /**
+   * シーンが生成されるときに呼び出されるメソッド。
+   */
   create() {
-    // PreloadSceneに移行
+    // アセットの読み込みを担当する`PreloadScene`に速やかに移行します。
     this.scene.start('PreloadScene');
   }
 }

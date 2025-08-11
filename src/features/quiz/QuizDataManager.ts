@@ -1,6 +1,11 @@
 import Phaser from 'phaser';
 
-// クイズデータの構造を定義
+/**
+ * @interface QuizData
+ * @description
+ * 1問分のクイズデータを表現するオブジェクトの型定義です。
+ * 問題文、選択肢、正解の文字列に加えて、カテゴリや出典情報などのメタデータも格納できます。
+ */
 export interface QuizData {
   question: string;
   choices: string[];
@@ -14,7 +19,23 @@ export interface QuizData {
 }
 
 /**
- * クイズデータの読み込み、検証、選択を担当するクラス
+ * @class QuizDataManager
+ * @description
+ * クイズデータの管理に特化したクラスです。JSONファイルからのデータ読み込み、
+ * カテゴリによるフィルタリング、そして出題する問題のランダムな選択といった責務を担います。
+ *
+ * [設計思想]
+ * - **責務の分離 (SoC)**: クイズのデータ管理ロジックを、UIの表示や入力処理を行うシーン
+ *   (`QuizScene`など) から完全に分離しています。これにより、`QuizScene`はクイズの
+ *   見せ方や進行に集中でき、データソースの変更（例: JSONからAPI取得へ）があった場合も、
+ *   このクラスの修正だけで対応可能になります。
+ * - **状態管理**: `quizData`（マスターデータ）と `availableQuestions`（出題可能な問題リスト）
+ *   という2つの状態を内部で管理しています。これにより、一度出題した問題がすぐに
+ *   再出題されるのを防ぎ、すべての問題が一通り出題されたらリセットする、という
+ *   一般的なクイズの挙動を実現しています。
+ * - **堅牢性**: `load`メソッド内では、データの存在チェックや型チェックを行い、
+ *   予期せぬデータ形式や読み込み失敗に対して警告を出し、安全に処理を中断する
+ *   仕組み（早期リターン）を取り入れています。
  */
 export default class QuizDataManager {
   private quizData: QuizData[] = [];
@@ -23,10 +44,11 @@ export default class QuizDataManager {
   constructor(private scene: Phaser.Scene) {}
 
   /**
-   * JSONファイルからクイズデータを読み込み、検証・フィルタリングする
-   * @param cacheKey - プリロード時に使用したJSONのキー
-   * @param category - フィルタリングするカテゴリ（未指定の場合は全件）
-   * @returns 読み込みと検証が成功したかどうか
+   * 指定されたキーを使って、Phaserのキャッシュからクイズデータ（JSON）を読み込みます。
+   * 必要に応じて特定のカテゴリでデータをフィルタリングし、出題用の問題リストを初期化します。
+   * @param cacheKey - `scene.load.json()`で事前に読み込んだ際のキー名。
+   * @param category - (任意) 読み込むクイズのカテゴリ名。指定しない場合はすべての問題が対象になります。
+   * @returns {boolean} データの読み込みと初期化が正常に完了した場合はtrue、失敗した場合はfalseを返します。
    */
   public load(cacheKey: string, category?: string): boolean {
     try {
@@ -63,9 +85,10 @@ export default class QuizDataManager {
   }
 
   /**
-   * 利用可能な問題からランダムに1つ選択して返す
-   * 一度出題された問題は、すべての問題が出題されるまで再出題されない
-   * @returns ランダムに選択されたクイズデータ。利用可能な問題がない場合はundefined
+   * 出題可能な問題のリストから、ランダムに1問を取得して返します。
+   * このメソッドは、一度取得した問題をリストから削除するため、連続して呼び出しても同じ問題は返されません。
+   * 全ての問題が出題されると、リストは自動的にリセットされ、再度全ての問題が対象となります。
+   * @returns {QuizData | undefined} ランダムに選ばれたクイズデータ。利用可能な問題が一つもない場合は `undefined` を返します。
    */
   public getRandomQuestion(): QuizData | undefined {
     if (this.availableQuestions.length === 0) {

@@ -2,18 +2,33 @@ import Phaser from 'phaser';
 import { UIConstants } from './UIConstants';
 
 /**
- * ゲーム全体で共通して使用されるUI部品を作成するためのユーティリティクラス
- * 静的メソッドのみで構成される
+ * @class RetroUI
+ * @description
+ * ゲーム全体で一貫したレトロ風のUIコンポーネントを生成するための静的ユーティリティクラスです。
+ * このクラスは、インスタンスを作成せず、静的メソッド（`RetroUI.createPanel()`など）を直接呼び出して使用します。
+ *
+ * [設計思想]
+ * - **ユーティリティクラス**: UI要素の生成という共通の関心事を一箇所に集約しています。
+ *   静的メソッドのみで構成することで、状態を持たず、どこからでも安全に呼び出せるようにしています。
+ *   これにより、各シーンのコードがUIの具体的な描画ロジックで煩雑になるのを防ぎ、
+ *   「どのようなUIを生成するか」という宣言的な記述に集中できます。
+ * - **一貫性の強制**: `UIConstants`からフォント、色、サイズなどの定義を一元的に参照することで、
+ *   ゲーム全体のUIに統一感を持たせています。UIのスタイルを修正したい場合、
+ *   `UIConstants.ts` を変更するだけで、このクラスを通じて生成されるすべてのUIに一括で反映されます。
+ * - **再利用性の促進**: パネルやタイトル、説明文といった頻繁に使用されるUI部品の生成ロジックをメソッド化することで、
+ *   コードの重複を削減し、開発効率を向上させています。
  */
 export class RetroUI {
   /**
-   * 半透明のオーバーレイと中央パネルを持つ、基本的なUIパネルを作成します。
-   * @param scene - 対象のシーン
-   * @param x - パネルの中心X座標
-   * @param y - パネルの中心Y座標
-   * @param width - パネルの幅
-   * @param height - パネルの高さ
-   * @returns 作成されたオーバーレイとパネルのオブジェクト
+   * ポーズ画面や結果表示などで使用する、画面中央の基本的なUIパネルを生成します。
+   * 背景を暗くする半透明のオーバーレイと、コンテンツを表示する本体パネルで構成されます。
+   * @param scene - このUIを描画する対象のPhaserシーン。
+   * @param x - パネルの中心X座標。
+   * @param y - パネルの中心Y座標。
+   * @param width - パネルの幅。
+   * @param height - パネルの高さ。
+   * @returns {object} 生成されたオーバーレイとパネル本体（コンテナ）を含むオブジェクト。
+   *                   `overlay`はシーン全体を覆い、`panel`はその上に表示されるコンテンツの土台となります。
    */
   static createPanel(
     scene: Phaser.Scene,
@@ -46,13 +61,14 @@ export class RetroUI {
   }
 
   /**
-   * タイトル用の大きなテキストを作成します。
-   * @param scene - 対象のシーン
-   * @param container - テキストを追加するコンテナ
-   * @param text - 表示するテキスト
-   * @param y - コンテナ内のY座標
-   * @param style - デフォルトのスタイルを上書きするスタイルオブジェクト (例: { color: '#ff0000', fontSize: '40px' })
-   * @returns 作成されたテキストオブジェクト
+   * パネルやシーンのタイトルとして使用する、大きめのテキストオブジェクトを生成します。
+   * スタイルは`UIConstants`で定義されたデフォルト値に基づきますが、個別に上書きも可能です。
+   * @param scene - 対象のPhaserシーン。
+   * @param container - このテキストオブジェクトを追加する親コンテナ。
+   * @param text - 表示する文字列。
+   * @param y - 親コンテナ内でのY座標のオフセット。
+   * @param style - (任意) デフォルトのスタイルを上書きするためのPhaserテキストスタイルオブジェクト。
+   * @returns {Phaser.GameObjects.Text} 生成されたテキストオブジェクト。
    */
   static createTitle(
     scene: Phaser.Scene,
@@ -74,13 +90,14 @@ export class RetroUI {
   }
 
   /**
-   * 説明文用の小さなテキストを作成します。
-   * @param scene - 対象のシーン
-   * @param container - テキストを追加するコンテナ
-   * @param text - 表示するテキスト
-   * @param y - コンテナ内のY座標
-   * @param style - デフォルトのスタイルを上書きするスタイルオブジェクト (例: { lineSpacing: 10 })
-   * @returns 作成されたテキストオブジェクト
+   * 操作説明や補足情報など、小さめのテキストを生成します。
+   * デフォルトでは少しグレーがかった色で表示され、主要な情報と視覚的に区別されます。
+   * @param scene - 対象のPhaserシーン。
+   * @param container - このテキストオブジェクトを追加する親コンテナ。
+   * @param text - 表示する文字列。改行を含めることも可能です。
+   * @param y - 親コンテナ内でのY座標のオフセット。
+   * @param style - (任意) デフォルトのスタイルを上書きするためのPhaserテキストスタイルオブジェクト。
+   * @returns {Phaser.GameObjects.Text} 生成されたテキストオブジェクト。
    */
   static createInstructionText(
     scene: Phaser.Scene,
@@ -104,13 +121,14 @@ export class RetroUI {
   }
 
   /**
-   * 汎用的なテキストを作成します。
-   * @param scene - 対象のシーン
-   * @param x - X座標
-   * @param y - Y座標
-   * @param text - 表示するテキスト
-   * @param style - デフォルトのスタイルを上書きするスタイルオブジェクト
-   * @returns 作成されたテキストオブジェクト
+   * 特定のコンテナに属さない、汎用的なテキストオブジェクトを生成します。
+   * スコア表示など、UIの特定の位置に固定で表示するテキストに適しています。
+   * @param scene - 対象のPhaserシーン。
+   * @param x - シーン内での絶対X座標。
+   * @param y - シーン内での絶対Y座標。
+   * @param text - 表示する文字列。
+   * @param style - (任意) デフォルトのスタイルを上書きするためのPhaserテキストスタイルオブジェクト。
+   * @returns {Phaser.GameObjects.Text} 生成されたテキストオブジェクト。
    */
   static createSimpleText(
     scene: Phaser.Scene,
