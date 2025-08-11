@@ -1,13 +1,13 @@
 import Phaser from 'phaser';
-import { RetroUI } from '../ui/RetroUI';
-import { QuizData } from './QuizDataManager';
-import { UIConstants } from '../ui/UIConstants';
-import Menu from '../ui/components/Menu';
+import { RetroUI } from '../../../ui/styles/RetroUI';
+import { QuizData } from '../QuizDataManager';
+import { UIConstants } from '../../../ui/styles/UIConstants';
+import Menu from '../../../ui/components/Menu';
 
 /**
  * クイズシーンのUI要素の作成と更新を担当するクラス
  */
-export default class QuizUI {
+export default class QuizUIView {
   private overlay!: Phaser.GameObjects.Rectangle;
   private questionPanel!: Phaser.GameObjects.Container;
   private resultPanel!: Phaser.GameObjects.Container;

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { RetroUI } from '../ui/RetroUI';
+import { RetroUI } from '../ui/styles/RetroUI';
 import Menu from '../ui/components/Menu';
-import { UIConstants } from '../ui/UIConstants';
+import { UIConstants } from '../ui/styles/UIConstants';
 
 export default class QuizCategorySelectScene extends Phaser.Scene {
   private menu!: Menu;

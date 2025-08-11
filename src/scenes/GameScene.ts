@@ -1,17 +1,13 @@
 import Phaser from 'phaser';
-import Player, { PlayerConfig } from '../objects/Player';
-import Enemy from '../objects/Enemy';
-import Coin from '../objects/Coin';
-import Key from '../objects/Key';
-import Castle from '../objects/Castle';
-import MapLoader from '../objects/MapLoader';
-import Heart, { HeartConfig } from '../objects/Heart';
-import { RetroUI } from '../ui/RetroUI';
-import CollisionManager from '../systems/CollisionManager';
-import GameUI from '../ui/GameUI';
-import { MapObjects } from '../objects/MapLoader';
-import { EnemyConfig } from '../objects/Enemy';
-import { CoinConfig } from '../objects/Coin';
+import Player, { PlayerConfig } from '../features/player/Player';
+import Enemy, { EnemyConfig } from '../features/enemies/Enemy';
+import Coin, { CoinConfig } from '../features/items/Coin';
+import Key from '../features/items/Key';
+import Castle from '../features/castle/Castle';
+import MapLoader, { MapObjects } from '../core/data/MapLoader';
+import Heart, { HeartConfig } from '../features/items/Heart';
+import CollisionSystem from '../core/systems/CollisionSystem';
+import GameUIView from '../ui/views/GameUIView';
 
 const INVINCIBILITY_DURATION = 3000; // 3秒の無敵時間
 
@@ -30,8 +26,8 @@ export default class GameScene extends Phaser.Scene {
   private currentEnemy?: Enemy;
 
   // システムとUI
-  private collisionManager!: CollisionManager;
-  private gameUI!: GameUI;
+  private collisionSystem!: CollisionSystem;
+  private gameUIView!: GameUIView;
 
   // 入力
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -97,11 +93,11 @@ export default class GameScene extends Phaser.Scene {
     this.createMapObjects(mapObjects);
     this.createPlayer(mapObjects.player);
 
-    this.gameUI = new GameUI(this);
-    this.gameUI.create(this.player);
+    this.gameUIView = new GameUIView(this);
+    this.gameUIView.create(this.player);
 
-    this.collisionManager = new CollisionManager(this);
-    this.collisionManager.setupCollisions(this.player, this.platforms, this.coins, this.enemies, this.hearts, this.keys, this.castle);
+    this.collisionSystem = new CollisionSystem(this);
+    this.collisionSystem.setupCollisions(this.player as any, this.platforms, this.coins, this.enemies, this.hearts, this.keys, this.castle);
 
     this.cameras.main.startFollow(this.player);
     this.cameras.main.setLerp(1, 1);
@@ -118,7 +114,7 @@ export default class GameScene extends Phaser.Scene {
     const jumpIsDown = (this.cursors.up?.isDown || this.cursors.space?.isDown) ?? false;
 
     this.player.update(leftIsDown, rightIsDown, jumpIsDown);
-    this.gameUI.updateHp(this.player.health);
+    this.gameUIView.updateHp(this.player.health);
   }
 
 
@@ -219,7 +215,7 @@ export default class GameScene extends Phaser.Scene {
   // --- Event Handlers ---
 
   private handleCoinCollected(coin: Coin): void {
-    this.gameUI.updateScore(coin.value ?? 1);
+    this.gameUIView.updateScore(coin.value ?? 1);
     this.coins.killAndHide(coin);
     if (coin.body instanceof Phaser.Physics.Arcade.Body) {
       coin.body.enable = false;
@@ -260,7 +256,7 @@ export default class GameScene extends Phaser.Scene {
       this.scene.start('ClearScene', {
         stageId: this.currentStageId,
         mapPath: this.currentMapPath,
-        score: this.gameUI.getScore()
+        score: this.gameUIView.getScore()
       });
     }
   }
@@ -279,7 +275,7 @@ export default class GameScene extends Phaser.Scene {
         this.scene.start('GameOverScene', {
           stageId: this.currentStageId,
           mapPath: this.currentMapPath,
-          score: this.gameUI.getScore()
+          score: this.gameUIView.getScore()
         });
         return;
       }

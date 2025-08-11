@@ -1,4 +1,4 @@
-import BaseObject from './BaseObject';
+import BaseObject from '../../core/game-objects/BaseObject';
 
 // 定数
 const PLAYER_GRAVITY = 950;

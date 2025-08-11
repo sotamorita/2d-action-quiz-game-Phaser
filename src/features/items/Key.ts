@@ -1,4 +1,4 @@
-import BaseObject from './BaseObject';
+import BaseObject from '../../core/game-objects/BaseObject';
 
 // Tiledから渡されるプロパティの型定義
 export interface KeyConfig {

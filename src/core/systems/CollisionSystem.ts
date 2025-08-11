@@ -1,15 +1,15 @@
 import Phaser from 'phaser';
-import Player from '../objects/Player';
-import Coin from '../objects/Coin';
-import Enemy from '../objects/Enemy';
-import Heart from '../objects/Heart';
-import Key from '../objects/Key';
-import Castle from '../objects/Castle';
+import Player from '../../features/player/Player';
+import Coin from '../../features/items/Coin';
+import Enemy from '../../features/enemies/Enemy';
+import Heart from '../../features/items/Heart';
+import Key from '../../features/items/Key';
+import Castle from '../../features/castle/Castle';
 
 /**
  * 当たり判定を管理し、イベントを発行するクラス
  */
-export default class CollisionManager {
+export default class CollisionSystem {
   private scene: Phaser.Scene;
 
   constructor(scene: Phaser.Scene) {
@@ -52,7 +52,7 @@ export default class CollisionManager {
 
     // Playerと城の当たり判定
     if (castle) {
-      this.scene.physics.add.overlap(player, castle, this.handlePlayerCastleCollision, undefined, this);
+      this.scene.physics.add.overlap(player, castle as any, this.handlePlayerCastleCollision, undefined, this);
     }
   }
 

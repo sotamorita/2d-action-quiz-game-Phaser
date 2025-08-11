@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { UIConstants } from '../UIConstants';
+import { UIConstants } from '../styles/UIConstants';
 
 /**
  * メニューの設定オブジェクトのインターフェース

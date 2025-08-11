@@ -1,11 +1,11 @@
 import Phaser from 'phaser';
-import { RetroUI } from './RetroUI';
-import Player from '../objects/Player';
+import { RetroUI } from '../styles/RetroUI';
+import Player from '../../features/player/Player';
 
 /**
  * ゲーム内のUI要素を管理するクラス
  */
-export default class GameUI {
+export default class GameUIView {
   private scene: Phaser.Scene;
   private scoreText!: Phaser.GameObjects.Text;
   private hpText!: Phaser.GameObjects.Text;

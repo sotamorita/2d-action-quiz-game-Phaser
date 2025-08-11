@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import Menu from '../ui/components/Menu';
-import { UIConstants } from '../ui/UIConstants';
+import { UIConstants } from '../ui/styles/UIConstants';
 
 export default class TitleScene extends Phaser.Scene {
   private menu!: Menu;

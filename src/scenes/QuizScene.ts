@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import QuizDataManager, { QuizData } from '../quiz/QuizDataManager';
-import QuizUI from '../quiz/QuizUI';
+import QuizDataManager, { QuizData } from '../features/quiz/QuizDataManager';
+import QuizUIView from '../features/quiz/ui/QuizUIView';
 
 // クイズシーンの状態を管理するenum
 enum QuizState {
@@ -21,7 +21,7 @@ export default class QuizScene extends Phaser.Scene {
 
   // ヘルパークラス
   private dataManager!: QuizDataManager;
-  private ui!: QuizUI;
+  private ui!: QuizUIView;
 
   // 呼び出し元シーンの情報
   private returnSceneKey!: string;
@@ -37,7 +37,7 @@ export default class QuizScene extends Phaser.Scene {
 
     // ヘルパークラスのインスタンス化
     this.dataManager = new QuizDataManager(this);
-    this.ui = new QuizUI(this);
+    this.ui = new QuizUIView(this);
 
     // 状態のリセット
     this.isCorrect = false;
