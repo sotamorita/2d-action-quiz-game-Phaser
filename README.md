@@ -2,9 +2,11 @@
 
 知的好奇心を刺激する2Dアクションクイズゲーム！
 
-**ゲームをプレイする:** [https://sotamorita.github.io/2d-action-quiz-game-Phaser](https://sotamorita.github.io/2d-action-quiz-game-Phaser)
+**ゲームをプレイする:** <a href="https://sotamorita.github.io/2d-action-quiz-game-Phaser" target="_blank" rel="noopener noreferrer">https://sotamorita.github.io/2d-action-quiz-game-Phaser</a>
 
-[![プレイ動画](https://img.youtube.com/vi/2d5nNzlNGPc/0.jpg)](https://youtu.be/2d5nNzlNGPc)
+<a href="https://youtu.be/O_Xy8FTkWTs" target="_blank" rel="noopener noreferrer">
+  <img src="https://img.youtube.com/vi/O_Xy8FTkWTs/0.jpg" alt="プレイ動画">
+</a>
 
 ## 概要
 
