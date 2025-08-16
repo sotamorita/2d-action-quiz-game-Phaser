@@ -10,11 +10,9 @@ export interface QuizData {
   question: string;
   choices: string[];
   answer: string;
-  category?: string;
-  source_chunk?: string;
-  source_metadata?: {
-    file?: string;
-    page?: number;
+  source: {
+    text: string;
+    url: string;
   };
 }
 
@@ -44,33 +42,28 @@ export default class QuizDataManager {
   constructor(private scene: Phaser.Scene) {}
 
   /**
-   * 指定されたキーを使って、Phaserのキャッシュからクイズデータ（JSON）を読み込みます。
-   * 必要に応じて特定のカテゴリでデータをフィルタリングし、出題用の問題リストを初期化します。
-   * @param cacheKey - `scene.load.json()`で事前に読み込んだ際のキー名。
-   * @param category - (任意) 読み込むクイズのカテゴリ名。指定しない場合はすべての問題が対象になります。
+   * 指定されたカテゴリIDの配列を使い、Phaserのキャッシュからクイズデータを読み込みます。
+   * 複数のカテゴリのクイズデータをすべて結合し、出題用の問題リストを初期化します。
+   * @param categoryIds - `scene.load.json()`で事前に読み込んだ際のキー（カテゴリID）の配列。
    * @returns {boolean} データの読み込みと初期化が正常に完了した場合はtrue、失敗した場合はfalseを返します。
    */
-  public load(cacheKey: string, category?: string): boolean {
+  public load(categoryIds: string[]): boolean {
     try {
-      const data = this.scene.cache.json.get(cacheKey);
+      let allQuizzes: QuizData[] = [];
 
-      if (!data || !Array.isArray(data)) {
-        console.warn('QuizDataManager: Invalid quiz data format');
-        return false;
+      for (const id of categoryIds) {
+        const data = this.scene.cache.json.get(id);
+        if (data && Array.isArray(data)) {
+          allQuizzes = allQuizzes.concat(data);
+        } else {
+          console.warn(`QuizDataManager: Invalid or missing quiz data for category ID: ${id}`);
+        }
       }
 
-      // カテゴリでフィルタリング
-      if (category) {
-        this.quizData = data.filter(item =>
-          item.category === category ||
-          (category === 'general' && !item.category)
-        );
-      } else {
-        this.quizData = data;
-      }
+      this.quizData = allQuizzes;
 
       if (this.quizData.length === 0) {
-        console.warn(`QuizDataManager: No questions found for category: ${category || 'all'}`);
+        console.warn(`QuizDataManager: No questions found for the provided categories.`);
         return false;
       }
 

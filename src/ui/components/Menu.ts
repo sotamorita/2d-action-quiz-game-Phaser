@@ -139,6 +139,14 @@ export default class Menu extends Phaser.GameObjects.Container {
   private moveSelection(delta: number): void {
     this.selectedIndex = (this.selectedIndex + delta + this.options.length) % this.options.length;
     this.updateSelection();
+
+    // 選択が変更されたことを通知するイベントを発行
+    const selectedItem = this.menuItems[this.selectedIndex];
+    this.emit('selectionChanged', {
+      index: this.selectedIndex,
+      y: selectedItem.y,
+      height: selectedItem.height,
+    });
   }
 
   /**

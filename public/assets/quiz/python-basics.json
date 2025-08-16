@@ -1,0 +1,16 @@
+[
+  {
+    "question": "Pythonでリストの最後に要素を追加するメソッドはどれですか？",
+    "choices": [
+      "add()",
+      "append()",
+      "insert()",
+      "push()"
+    ],
+    "answer": "append()",
+    "source": {
+      "text": "list.append(x) は、リストの末尾に要素を 1 つ追加します。",
+      "url": "https://docs.python.org/ja/3/tutorial/datastructures.html"
+    }
+  }
+]

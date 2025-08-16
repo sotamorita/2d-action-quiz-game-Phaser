@@ -34,6 +34,7 @@ export const UIConstants = {
     Yellow: '#ffff00',
     Green: '#00ff00',
     Red: '#ff0000',
+    Blue: '#87ceeb', // リンク用の明るい青
     Grey: '#cccccc',
     DarkGrey: '#666666',
   },

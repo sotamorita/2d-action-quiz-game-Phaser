@@ -1,0 +1,16 @@
+[
+  {
+    "question": "EC2インスタンスに接続する際に利用されるプロトコルはどれですか？",
+    "choices": [
+      "FTP",
+      "SSH",
+      "HTTP",
+      "SMTP"
+    ],
+    "answer": "SSH",
+    "source": {
+      "text": "Amazon EC2 インスタンスに接続するには、Secure Shell (SSH) を使用します。SSH は、ネットワーク上の 2 つのコンピュータ間で安全な通信を可能にする暗号化されたネットワークプロトコルです。",
+      "url": "https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/AccessingInstances.html"
+    }
+  }
+]

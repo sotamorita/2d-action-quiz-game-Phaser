@@ -1,0 +1,16 @@
+[
+  {
+    "question": "Gitでローカルリポジトリの変更をリモートリポジトリに送信するコマンドはどれですか？",
+    "choices": [
+      "git pull",
+      "git push",
+      "git commit",
+      "git merge"
+    ],
+    "answer": "git push",
+    "source": {
+      "text": "git push コマンドは、リモート参照をローカル参照で更新するために使用します。",
+      "url": "https://git-scm.com/docs/git-push/ja"
+    }
+  }
+]

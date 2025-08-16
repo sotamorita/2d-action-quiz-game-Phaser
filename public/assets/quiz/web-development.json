@@ -1,0 +1,16 @@
+[
+  {
+    "question": "HTTPステータスコード404の意味は何ですか？",
+    "choices": [
+      "サーバーエラー",
+      "認証が必要",
+      "ページが見つからない",
+      "リクエストが成功"
+    ],
+    "answer": "ページが見つからない",
+    "source": {
+      "text": "404 Not Found クライアントエラーレスポンスコードは、サーバーが要求されたリソースを見つけられなかったことを示します。",
+      "url": "https://developer.mozilla.org/ja/docs/Web/HTTP/Status/404"
+    }
+  }
+]

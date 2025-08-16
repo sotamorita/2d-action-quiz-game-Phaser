@@ -114,10 +114,9 @@ export default class QuizUIView {
    * @param isCorrect - 正解だったかどうか。
    * @param userAnswer - ユーザーが選択した回答。
    * @param correctAnswer - 正しい回答。
-   * @param source - (任意) 問題の出典メタデータ。
-   * @param sourceChunk - (任意) 問題の出典に関する詳細なテキスト。
+   * @param source - (任意) 問題の出典情報（引用文とURL）。
    */
-  public showResult(isCorrect: boolean, userAnswer: string, correctAnswer: string, source?: QuizData['source_metadata'], sourceChunk?: string): void {
+  public showResult(isCorrect: boolean, userAnswer: string, correctAnswer: string, source?: QuizData['source']): void {
     if (this.menu) this.menu.destroy();
     this.questionPanel.setVisible(false);
     this.resultPanel.setVisible(true);
@@ -140,40 +139,42 @@ export default class QuizUIView {
     }).setOrigin(0.5);
     this.resultPanel.add(choiceText);
 
-    if (source || sourceChunk) {
-      this.showSourceInfo(source, sourceChunk);
+    if (source) {
+      this.showSourceInfo(source);
     }
 
-    const instructionText = RetroUI.createSimpleText(this.scene, 0, 130, 'Enter / Space / Esc キーで閉じる', {
-      fontSize: UIConstants.FontSize.Small,
-      color: UIConstants.Color.Grey
-    }).setOrigin(0.5);
-    this.resultPanel.add(instructionText);
+    // instructionTextは削除し、閉じるボタンに置き換える
+  }
+
+  /**
+   * 結果パネルに表示される「閉じる」ボタンに、クリックされたときに実行されるコールバック関数を設定します。
+   * @param callback - ボタンがクリックされたときに呼び出される関数。
+   */
+  public setCloseButtonCallback(callback: () => void): void {
+    const closeButton = RetroUI.createSimpleText(this.scene, 0, 130, '[ 閉じる ]', {
+      fontSize: UIConstants.FontSize.Normal,
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+    closeButton.on('pointerdown', callback);
+
+    this.resultPanel.add(closeButton);
   }
 
   /**
    * 問題の出典元に関する情報を結果パネル内に表示します。
-   * @param source - 出典のメタデータ（ファイル名やページ番号など）。
-   * @param sourceChunk - 出典の具体的なテキスト内容。
+   * @param source - 出典情報（引用文とURL）。
    * @private
    */
-  private showSourceInfo(source?: QuizData['source_metadata'], sourceChunk?: string): void {
-    if (!source || !sourceChunk) return;
+  private showSourceInfo(source: QuizData['source']): void {
+    // 出典URL表示とクリックイベント
+    const sourceText = RetroUI.createSimpleText(this.scene, 0, -25, `出典: ${source.url}`, {
+      fontSize: UIConstants.FontSize.Small,
+      color: UIConstants.Color.Blue, // リンクであることが分かるように青色にする
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-    // 出典表示
-    let sourceInfo = '出典：';
-    if (source.file) {
-      sourceInfo += source.file;
-      if (source.page) {
-        sourceInfo += `(p.${source.page})`;
-      }
-    } else {
-      sourceInfo += '不明';
-    }
-
-    const sourceText = RetroUI.createSimpleText(this.scene, 0, -25, sourceInfo, {
-      fontSize: UIConstants.FontSize.Small
-    }).setOrigin(0.5);
+    sourceText.on('pointerdown', () => {
+      window.open(source.url, '_blank');
+    });
     this.resultPanel.add(sourceText);
 
     // 区切り線
@@ -185,7 +186,7 @@ export default class QuizUIView {
     this.resultPanel.add(separator);
 
     // スクロール可能なテキストエリア
-    this.createScrollableText(sourceChunk);
+    this.createScrollableText(source.text);
   }
 
   /**

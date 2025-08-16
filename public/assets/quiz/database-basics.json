@@ -1,0 +1,16 @@
+[
+  {
+    "question": "SQLでデータを取得するために使用するコマンドはどれですか？",
+    "choices": [
+      "INSERT",
+      "UPDATE",
+      "SELECT",
+      "DELETE"
+    ],
+    "answer": "SELECT",
+    "source": {
+      "text": "SELECT ステートメントは、1 つ以上のテーブルまたはビューからデータを取り出すために使用します。",
+      "url": "https://www.ibm.com/docs/ja/db2/11.5?topic=statements-select"
+    }
+  }
+]

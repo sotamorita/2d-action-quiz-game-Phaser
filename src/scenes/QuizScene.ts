@@ -53,7 +53,7 @@ export default class QuizScene extends Phaser.Scene {
 
   // 呼び出し元シーンの情報
   private returnSceneKey!: string; // クイズ終了後に戻るシーンのキー
-  private category?: string; // クイズのカテゴリ
+  private categoriesToLoad: { id: string; filePath: string }[] = []; // 読み込むべきクイズカテゴリの情報
 
   constructor() {
     super({ key: 'QuizScene' });
@@ -61,11 +61,13 @@ export default class QuizScene extends Phaser.Scene {
 
   /**
    * シーンの初期化処理。呼び出し元シーンからデータを受け取ります。
-   * @param {{ category?: string; returnSceneKey: string }} data
+   * @param {{ returnSceneKey: string }} data
    */
-  init(data: { category?: string; returnSceneKey: string }) {
+  init(data: { returnSceneKey: string }) {
     this.returnSceneKey = data.returnSceneKey;
-    this.category = data.category;
+
+    // Registryから選択されたカテゴリ情報を取得。なければ空配列
+    this.categoriesToLoad = this.registry.get('selectedQuizCategories') || [];
 
     this.dataManager = new QuizDataManager(this);
     this.ui = new QuizUIView(this);
@@ -76,18 +78,31 @@ export default class QuizScene extends Phaser.Scene {
   }
 
   /**
-   * アセットのプリロード。ここではクイズデータ(JSON)を読み込みます。
+   * アセットのプリロード。選択されたカテゴリのJSONファイルを動的に読み込みます。
    */
   preload() {
-    this.load.json('quiz_db', 'assets/quiz/quiz_db.json');
+    if (this.categoriesToLoad.length === 0) {
+      console.warn('QuizScene: No categories selected to load.');
+      return;
+    }
+    // 選択されたすべてのカテゴリのJSONファイルを読み込む
+    this.categoriesToLoad.forEach(category => {
+      this.load.json(category.id, category.filePath);
+    });
   }
 
   /**
    * シーンの生成処理。
    */
   create() {
-    // クイズデータをロードし、失敗した場合は安全にシーンを終了します。
-    if (!this.dataManager.load('quiz_db', this.category)) {
+    if (this.categoriesToLoad.length === 0) {
+      this.safeExit();
+      return;
+    }
+
+    // 読み込んだすべてのカテゴリIDをDataManagerに渡してクイズデータを初期化
+    const categoryIds = this.categoriesToLoad.map(c => c.id);
+    if (!this.dataManager.load(categoryIds)) {
       this.safeExit();
       return;
     }
@@ -124,8 +139,7 @@ export default class QuizScene extends Phaser.Scene {
           this.isCorrect,
           this.userAnswer!,
           this.currentQuestion!.answer,
-          this.currentQuestion!.source_metadata,
-          this.currentQuestion!.source_chunk
+          this.currentQuestion!.source
         );
         this.setupResultInput(); // 結果画面を閉じるための入力を設定
         break;
@@ -146,14 +160,15 @@ export default class QuizScene extends Phaser.Scene {
       this.input.keyboard!.off('keydown-ENTER', closeHandler);
       this.input.keyboard!.off('keydown-SPACE', closeHandler);
       this.input.keyboard!.off('keydown-ESC', closeHandler);
-      this.input.off('pointerdown', closeHandler);
       this.transitionToState(QuizState.CLOSING);
     };
 
     this.input.keyboard!.on('keydown-ENTER', closeHandler);
     this.input.keyboard!.on('keydown-SPACE', closeHandler);
     this.input.keyboard!.on('keydown-ESC', closeHandler);
-    this.input.once('pointerdown', closeHandler);
+
+    // UIビューに閉じるボタンのクリックイベントを設定させる
+    this.ui.setCloseButtonCallback(closeHandler);
   }
 
   /**

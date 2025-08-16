@@ -1,0 +1,30 @@
+{
+  "title": "クイズカテゴリ一覧",
+  "categories": [
+    {
+      "id": "aws-level1",
+      "name": "AWS (Level 1)",
+      "filePath": "assets/quiz/aws-level1.json"
+    },
+    {
+      "id": "python-basics",
+      "name": "Python (基礎)",
+      "filePath": "assets/quiz/python-basics.json"
+    },
+    {
+      "id": "web-development",
+      "name": "Web開発 (基礎)",
+      "filePath": "assets/quiz/web-development.json"
+    },
+    {
+      "id": "database-basics",
+      "name": "データベース (基礎)",
+      "filePath": "assets/quiz/database-basics.json"
+    },
+    {
+      "id": "git-basics",
+      "name": "Git (基礎)",
+      "filePath": "assets/quiz/git-basics.json"
+    }
+  ]
+}
