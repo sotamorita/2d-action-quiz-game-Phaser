@@ -116,7 +116,9 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.json('level2', 'assets/maps/level2.json');
 
     // クイズデータ (JSON)
-    this.load.json('quiz_db', 'assets/quiz/quiz_db.json');
+    // this.load.json('quiz_db', 'assets/quiz/quiz_db.json'); // 統合ファイルは存在しないためコメントアウト
+    // クイズカテゴリデータ (JSON) - SelectedQuizDisplayで使用
+    this.load.json('quiz_categories', 'assets/quiz/categories.json');
   }
 
   /**

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { RetroUI } from '../ui/styles/RetroUI';
 import Menu from '../ui/components/Menu';
+import { SelectedQuizDisplay } from '../ui/components/SelectedQuizDisplay';
 import { UIConstants } from '../ui/styles/UIConstants';
 
 /**
@@ -61,7 +62,7 @@ export default class PauseOverlayScene extends Phaser.Scene {
     const centerY = this.cameras.main.height / 2;
 
     // レトロ風UIパネル作成
-    const { panel } = RetroUI.createPanel(this, centerX, centerY, 350, 280);
+    const { panel } = RetroUI.createPanel(this, centerX, centerY, 400, 250);
 
     // タイトルテキスト
     RetroUI.createTitle(panel.scene, panel, 'ポーズ', -80);
@@ -102,6 +103,11 @@ export default class PauseOverlayScene extends Phaser.Scene {
 
     // クリーンアップ設定
     this.events.once('shutdown', this.cleanup, this);
+
+    // 現在選択中のクイズカテゴリを表示
+    const selectedQuizDisplay = new SelectedQuizDisplay(this);
+    // 画面右下に配置
+    selectedQuizDisplay.setPosition(this.cameras.main.width - 15, this.cameras.main.height - 10, 1, 1);
   }
 
   /**

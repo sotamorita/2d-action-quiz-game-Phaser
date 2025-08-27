@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import Menu from '../ui/components/Menu';
+import { SelectedQuizDisplay } from '../ui/components/SelectedQuizDisplay';
 import { UIConstants } from '../ui/styles/UIConstants';
 import { CommonBackground } from '../ui/views/CommonBackground';
 
@@ -98,6 +99,10 @@ export default class TitleScene extends Phaser.Scene {
         this.scene.start('QuizCategorySelectScene');
       }
     });
+
+    // 現在選択中のクイズカテゴリを表示
+    const selectedQuizDisplay = new SelectedQuizDisplay(this);
+    selectedQuizDisplay.setPosition(this.cameras.main.width - 15, this.cameras.main.height - 10, 1, 1);
   }
 
   /**
