@@ -22,9 +22,29 @@ export default class BootScene extends Phaser.Scene {
   }
 
   /**
+   * デフォルト設定に必要なアセットを読み込みます。
+   */
+  preload() {
+    // デフォルトのクイズカテゴリを設定するために、カテゴリ情報を読み込みます。
+    this.load.json('quiz_categories', 'assets/quiz/categories.json');
+  }
+
+  /**
    * シーンが生成されるときに呼び出されるメソッド。
+   * デフォルトのクイズカテゴリを設定し、次のシーンへ移行します。
    */
   create() {
+    // まだクイズカテゴリが選択されていない場合のみ、デフォルト値を設定
+    if (!this.registry.has('selectedQuizCategories')) {
+      const categoryData = this.cache.json.get('quiz_categories');
+      const allCategories = categoryData.categories.map((c: { id: string; filePath: string }) => ({
+        id: c.id,
+        filePath: c.filePath,
+      }));
+      this.registry.set('selectedQuizCategories', allCategories);
+      console.log('Default quiz categories set:', allCategories);
+    }
+
     // アセットの読み込みを担当する`PreloadScene`に速やかに移行します。
     this.scene.start('PreloadScene');
   }
